@@ -44,7 +44,7 @@
       padding: 0 20px; height: 56px;
       display: flex; align-items: center; justify-content: space-between;
     }
-    .topbar-logo { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 800; letter-spacing: 3px; color: var(--accent); }
+    .topbar-logo { font-family: 'Noto Sans KR', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 2px; color: var(--accent); }
     .topbar-right { display: flex; align-items: center; gap: 10px; }
     #userNickname { font-size: 12px; color: var(--muted); }
     #logoutBtn {
@@ -84,7 +84,7 @@
       background: linear-gradient(90deg, transparent, rgba(43,124,255,0.4), transparent);
     }
     .stat-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
-    .stat-value { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; }
+    .stat-value { font-family: 'Noto Sans KR', sans-serif; font-size: 20px; font-weight: 700; }
     #cashText { color: var(--green); }
     #totalAssetsText { color: var(--accent); }
     .update-notice {
@@ -93,12 +93,7 @@
       font-size: 11.5px; color: var(--muted); line-height: 1.8;
     }
     .update-notice b { color: var(--accent); }
-    .time-badge {
-      display: inline-block; background: rgba(0,212,255,0.1);
-      border: 1px solid rgba(0,212,255,0.2); border-radius: 6px;
-      padding: 1px 8px; font-size: 11px; color: var(--accent);
-      font-family: monospace; font-weight: 700; margin: 0 2px;
-    }
+    .time-badge { font-weight: 700; color: var(--txt); }
     .sec-label {
       font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
       text-transform: uppercase; color: var(--pri);
@@ -173,7 +168,7 @@
 <body>
 
   <div class="topbar">
-    <span class="topbar-logo">STOCKLAB</span>
+    <span class="topbar-logo">모의투자 경진대회</span>
     <div class="topbar-right">
       <span id="userNickname">-</span>
       <button id="logoutBtn">로그아웃</button>
@@ -199,14 +194,6 @@
       </div>
     </div>
 
-    <div class="update-notice">
-      📊 <b>자산 & 랭킹 자동 업데이트</b><br>
-      🇰🇷 한국 장마감 후 <span class="time-badge">16:30 KST</span> 평일 1회
-      &nbsp;·&nbsp;
-      🇺🇸 미국 장마감 후 <span class="time-badge">06:00 KST</span> 평일 1회<br>
-      총 자산과 랭킹은 하루 최대 2회 자동으로 반영됩니다.
-    </div>
-
     <div class="sec-label">주식 조회 및 거래</div>
     <div class="trade-input-group">
       <input id="qSymbol" placeholder="종목코드 입력 (예: AAPL)" style="flex:1;" />
@@ -225,6 +212,10 @@
         ※ 한국주식은 실시간 환율로 자동 달러 환산
         <span id="currentRateText" style="color:var(--warn);">(환율 로딩 중...)</span>
       </div>
+      <div style="margin-top:10px; padding-top:8px; border-top:1px solid var(--line); color:var(--muted); font-size:11px; line-height:1.7;">
+        ⚠️ <b style="color:var(--warn);">장 마감 후에는 마지막 종가로 조회됩니다.</b><br>
+        새로고침을 반복해도 가격이 변하지 않는 것은 정상입니다.
+      </div>
     </div>
 
     <div id="qOutBox">
@@ -232,6 +223,14 @@
         <div id="qSymbolText">-</div>
         <div id="qPriceText">$0.00</div>
       </div>
+    </div>
+
+    <div class="update-notice" style="margin-top: 24px;">
+      📊 <b>자산 & 랭킹 자동 업데이트</b><br>
+      🇰🇷 한국 장마감 후 <span class="time-badge">16:30</span> 평일 1회
+      &nbsp;·&nbsp;
+      🇺🇸 미국 장마감 후 <span class="time-badge">06:00</span> 평일 1회<br>
+      총 자산과 랭킹은 하루 최대 2회 자동으로 반영됩니다.
     </div>
 
     <div class="sec-label">📦 내 포트폴리오</div>
