@@ -85,7 +85,7 @@ async function buyStock() {
   const qty = parseInt(prompt(`[${curSym}] 매수 수량:`, "1"));
   if(isNaN(qty) || qty <= 0) return;
   try {
-    const result = await callTradeAPI({ type: "BUY", symbol: curSym, qty: qty, price: curPrice });
+    const result = await callTradeAPI({ type: "BUY", symbol: curSym, qty: qty });
     if(result.data.success) { alert("매수 완료!"); refreshData(); }
   } catch(e) { alert("매수 실패"); }
 }
@@ -94,7 +94,7 @@ async function sellStock(sym, currentPrice) {
   const qty = parseInt(prompt(`[${sym}] 매도 수량:`, "1"));
   if(isNaN(qty) || qty <= 0) return;
   try {
-    const result = await callTradeAPI({ type: "SELL", symbol: sym, qty: qty, price: currentPrice });
+    const result = await callTradeAPI({ type: "SELL", symbol: sym, qty: qty });
     if(result.data.success) { alert("매도 완료!"); refreshData(); }
   } catch(e) { alert("매도 실패"); }
 }
