@@ -1,0 +1,496 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>모의투자 시스템 — 로그인</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --card: rgba(18, 25, 35, 0.88);
+      --line: #1e2a3a;
+      --line2: #243444;
+      --muted: #93a4b8;
+      --txt: #eaf0f7;
+      --pri: #2b7cff;
+      --pri-glow: rgba(43,124,255,0.25);
+      --warn: #ffd479;
+      --up: #ff4d4d;
+      --accent: #00d4ff;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: var(--bg);
+      color: var(--txt);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── 배경 파티클 캔버스 ── */
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ── 배경 그리드 ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(43,124,255,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(43,124,255,0.04) 1px, transparent 1px);
+      background-size: 48px 48px;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ── 중앙 글로우 ── */
+    body::after {
+      content: '';
+      position: fixed;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px; height: 600px;
+      background: radial-gradient(ellipse, rgba(43,124,255,0.07) 0%, transparent 70%);
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ── 래퍼 ── */
+    .wrap {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 420px;
+      padding: 0 20px;
+      animation: fadeUp 0.6s cubic-bezier(0.22,1,0.36,1) both;
+    }
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── 로고 영역 ── */
+    .logo-area {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+    .logo-icon {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 56px; height: 56px;
+      background: linear-gradient(135deg, #1a3a6e, #0d1f3c);
+      border: 1px solid rgba(43,124,255,0.4);
+      border-radius: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 0 24px rgba(43,124,255,0.2);
+    }
+    .logo-icon svg { width: 28px; height: 28px; }
+    .logo-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 22px;
+      font-weight: 800;
+      color: var(--txt);
+      letter-spacing: 1px;
+      display: block;
+    }
+    .logo-sub {
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: 0.5px;
+      margin-top: 4px;
+      display: block;
+    }
+
+    /* ── 카드 ── */
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 32px;
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      box-shadow:
+        0 24px 48px rgba(0,0,0,0.5),
+        0 0 0 1px rgba(255,255,255,0.03) inset,
+        0 1px 0 rgba(255,255,255,0.06) inset;
+      position: relative;
+      overflow: hidden;
+    }
+    /* 카드 상단 라인 */
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 10%; right: 10%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--pri), transparent);
+      opacity: 0.6;
+    }
+
+    .card-title {
+      font-family: 'Syne', sans-serif;
+      font-size: 17px;
+      font-weight: 700;
+      margin-bottom: 24px;
+      color: var(--txt);
+    }
+
+    /* ── 입력 필드 ── */
+    .field { margin-bottom: 14px; }
+    .field label {
+      display: block;
+      font-size: 10.5px;
+      font-weight: 700;
+      color: var(--muted);
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      margin-bottom: 7px;
+    }
+    .field input {
+      width: 100%;
+      height: 46px;
+      background: rgba(10, 16, 24, 0.8);
+      border: 1px solid var(--line2);
+      border-radius: 12px;
+      color: var(--txt);
+      padding: 0 16px;
+      font-size: 14px;
+      font-family: 'Noto Sans KR', sans-serif;
+      outline: none;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .field input:focus {
+      border-color: var(--pri);
+      box-shadow: 0 0 0 3px var(--pri-glow);
+    }
+    .field input::placeholder { color: #3a4a5a; }
+
+    /* ── 로그인 버튼 ── */
+    .btn-login {
+      width: 100%;
+      height: 48px;
+      margin-top: 10px;
+      background: linear-gradient(135deg, #1e5eff, #2b7cff);
+      border: 0;
+      border-radius: 12px;
+      color: #fff;
+      font-family: 'Noto Sans KR', sans-serif;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+      box-shadow: 0 4px 20px rgba(43,124,255,0.35);
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-login::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(rgba(255,255,255,0.08), transparent);
+    }
+    .btn-login:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 28px rgba(43,124,255,0.45);
+    }
+    .btn-login:active { transform: translateY(0); }
+    .btn-login:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+
+    /* ── 에러 메시지 ── */
+    .error-msg {
+      display: none;
+      margin-top: 12px;
+      padding: 10px 14px;
+      background: rgba(255,77,77,0.1);
+      border: 1px solid rgba(255,77,77,0.25);
+      border-radius: 10px;
+      font-size: 12.5px;
+      color: #ff7070;
+      text-align: center;
+    }
+    .error-msg.show { display: block; animation: shake 0.3s ease; }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      25%      { transform: translateX(-4px); }
+      75%      { transform: translateX(4px); }
+    }
+
+    /* ── 스피너 ── */
+    .spinner {
+      display: inline-block;
+      width: 16px; height: 16px;
+      border: 2px solid rgba(255,255,255,0.3);
+      border-top-color: #fff;
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── 하단 안내 ── */
+    .info-row {
+      margin-top: 20px;
+      padding: 14px 16px;
+      background: rgba(43,124,255,0.05);
+      border: 1px solid rgba(43,124,255,0.12);
+      border-radius: 12px;
+      font-size: 11.5px;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .info-row b { color: var(--pri); }
+
+    /* ── 하단 시세 티커 ── */
+    .ticker-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      height: 32px;
+      background: rgba(7,10,15,0.9);
+      border-top: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      overflow: hidden;
+      z-index: 10;
+    }
+    .ticker-track {
+      display: flex;
+      gap: 40px;
+      animation: ticker 30s linear infinite;
+      white-space: nowrap;
+      padding-left: 100%;
+    }
+    @keyframes ticker {
+      from { transform: translateX(0); }
+      to   { transform: translateX(-50%); }
+    }
+    .ticker-item {
+      font-size: 11px;
+      font-family: monospace;
+      letter-spacing: 0.5px;
+    }
+    .ticker-item .sym { color: var(--muted); margin-right: 5px; }
+    .ticker-item .up  { color: var(--up); }
+    .ticker-item .dn  { color: #4d94ff; }
+
+    @media (max-width: 440px) {
+      .card { padding: 24px 20px; border-radius: 18px; }
+      .logo-title { font-size: 19px; }
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+
+<div class="wrap">
+  <!-- 로고 -->
+  <div class="logo-area">
+    <div class="logo-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="color:#2b7cff">
+        <polyline points="22 7 13.5 15.5 8.5 10.5 2 17"/>
+        <polyline points="16 7 22 7 22 13"/>
+      </svg>
+    </div>
+    <span class="logo-title">모의투자 시스템</span>
+    <span class="logo-sub">부평중학교 금융 교육 플랫폼</span>
+  </div>
+
+  <!-- 로그인 카드 -->
+  <div class="card">
+    <div class="card-title">로그인</div>
+
+    <div class="field">
+      <label>이메일</label>
+      <input id="loginEmail" type="email" placeholder="example@school.kr" autocomplete="email" />
+    </div>
+    <div class="field">
+      <label>비밀번호</label>
+      <input id="loginPw" type="password" placeholder="••••••••" autocomplete="current-password" />
+    </div>
+
+    <button id="loginBtn" class="btn-login">로그인</button>
+    <div id="errorMsg" class="error-msg">이메일 또는 비밀번호가 올바르지 않습니다.</div>
+
+    <div class="info-row">
+      <b>학생</b>은 로그인 후 투자 화면으로 이동합니다.<br>
+      <b>관리자</b>는 로그인 후 관리 페이지로 이동합니다.<br>
+      계정이 없다면 선생님께 문의하세요.
+    </div>
+  </div>
+</div>
+
+<!-- 하단 티커 -->
+<div class="ticker-bar">
+  <div class="ticker-track" id="tickerTrack">
+    <span class="ticker-item"><span class="sym">AAPL</span><span class="up">▲ 213.49</span></span>
+    <span class="ticker-item"><span class="sym">TSLA</span><span class="dn">▼ 248.23</span></span>
+    <span class="ticker-item"><span class="sym">NVDA</span><span class="up">▲ 875.40</span></span>
+    <span class="ticker-item"><span class="sym">AMZN</span><span class="up">▲ 192.30</span></span>
+    <span class="ticker-item"><span class="sym">005930.KS</span><span class="dn">▼ 73,400</span></span>
+    <span class="ticker-item"><span class="sym">MSFT</span><span class="up">▲ 412.65</span></span>
+    <span class="ticker-item"><span class="sym">GOOGL</span><span class="up">▲ 178.02</span></span>
+    <span class="ticker-item"><span class="sym">086520.KQ</span><span class="up">▲ 84,500</span></span>
+    <span class="ticker-item"><span class="sym">META</span><span class="up">▲ 551.30</span></span>
+    <span class="ticker-item"><span class="sym">005380.KS</span><span class="dn">▼ 212,000</span></span>
+    <!-- 루프를 위한 복사본 -->
+    <span class="ticker-item"><span class="sym">AAPL</span><span class="up">▲ 213.49</span></span>
+    <span class="ticker-item"><span class="sym">TSLA</span><span class="dn">▼ 248.23</span></span>
+    <span class="ticker-item"><span class="sym">NVDA</span><span class="up">▲ 875.40</span></span>
+    <span class="ticker-item"><span class="sym">AMZN</span><span class="up">▲ 192.30</span></span>
+    <span class="ticker-item"><span class="sym">005930.KS</span><span class="dn">▼ 73,400</span></span>
+    <span class="ticker-item"><span class="sym">MSFT</span><span class="up">▲ 412.65</span></span>
+    <span class="ticker-item"><span class="sym">GOOGL</span><span class="up">▲ 178.02</span></span>
+    <span class="ticker-item"><span class="sym">086520.KQ</span><span class="up">▲ 84,500</span></span>
+    <span class="ticker-item"><span class="sym">META</span><span class="up">▲ 551.30</span></span>
+    <span class="ticker-item"><span class="sym">005380.KS</span><span class="dn">▼ 212,000</span></span>
+  </div>
+</div>
+
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+  import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCzjJDKMbzHjs7s7jMnfK64bbHEEmpyZxI",
+    authDomain: "stock-62c76.firebaseapp.com",
+    projectId: "stock-62c76",
+    storageBucket: "stock-62c76.firebasestorage.app",
+    messagingSenderId: "149071161310",
+    appId: "1:149071161310:web:79ebd6",
+  };
+
+  // ── HEAD ADMIN 이메일 (본인 계정으로 교체) ──────────────────
+  const HEAD_ADMIN_EMAIL = "YOUR_HEAD_ADMIN_EMAIL@example.com";
+
+  const app = initializeApp(firebaseConfig);
+  const db  = getFirestore(app);
+  const auth = getAuth(app);
+
+  const loginBtn  = document.getElementById("loginBtn");
+  const errorMsg  = document.getElementById("errorMsg");
+
+  // ── 이미 로그인된 경우 바로 분기 ─────────────────────────
+  onAuthStateChanged(auth, async (user) => {
+    if (user) await redirectByRole(user);
+  });
+
+  // ── 로그인 버튼 ───────────────────────────────────────────
+  loginBtn.onclick = async () => {
+    const email = document.getElementById("loginEmail").value.trim();
+    const pw    = document.getElementById("loginPw").value.trim();
+    if (!email || !pw) {
+      showError("이메일과 비밀번호를 입력해주세요.");
+      return;
+    }
+
+    loginBtn.disabled = true;
+    loginBtn.innerHTML = `<span class="spinner"></span> 로그인 중...`;
+    errorMsg.classList.remove("show");
+
+    try {
+      const cred = await signInWithEmailAndPassword(auth, email, pw);
+      await redirectByRole(cred.user);
+    } catch (e) {
+      showError("이메일 또는 비밀번호가 올바르지 않습니다.");
+      loginBtn.disabled = false;
+      loginBtn.textContent = "로그인";
+    }
+  };
+
+  // ── Enter 키 지원 ─────────────────────────────────────────
+  document.getElementById("loginPw").addEventListener("keydown", (e) => {
+    if (e.key === "Enter") loginBtn.click();
+  });
+
+  // ── 역할에 따라 페이지 이동 ──────────────────────────────
+  async function redirectByRole(user) {
+    // 1) Head Admin 판별
+    if (user.email === HEAD_ADMIN_EMAIL) {
+      window.location.href = "admin.html";
+      return;
+    }
+
+    // 2) Middle Admin 판별 (Firestore admins 컬렉션)
+    try {
+      const adminSnap = await getDoc(doc(db, "admins", user.uid));
+      if (adminSnap.exists() && adminSnap.data().role === "middle") {
+        window.location.href = "admin.html";
+        return;
+      }
+    } catch (e) {
+      console.warn("admins 조회 실패:", e);
+    }
+
+    // 3) Student → 기존 투자 화면
+    window.location.href = "index.html";
+  }
+
+  function showError(msg) {
+    errorMsg.textContent = msg;
+    errorMsg.classList.add("show");
+  }
+
+  // ── 배경 파티클 (떠다니는 주가 숫자) ─────────────────────
+  const canvas = document.getElementById("bg-canvas");
+  const ctx = canvas.getContext("2d");
+  let W, H, particles = [];
+
+  function resize() {
+    W = canvas.width  = window.innerWidth;
+    H = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener("resize", resize);
+
+  const symbols = ["▲","▼","+","−","$","₩","0.5%","1.2%","3.4%","−2.1%","AAPL","TSLA","NVDA","KRW"];
+
+  for (let i = 0; i < 28; i++) {
+    particles.push({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: -Math.random() * 0.4 - 0.1,
+      text: symbols[Math.floor(Math.random() * symbols.length)],
+      alpha: Math.random() * 0.12 + 0.03,
+      size: Math.random() * 8 + 8,
+      color: Math.random() > 0.5 ? "#2b7cff" : "#ff4d4d",
+    });
+  }
+
+  function drawParticles() {
+    ctx.clearRect(0, 0, W, H);
+    particles.forEach(p => {
+      ctx.save();
+      ctx.globalAlpha = p.alpha;
+      ctx.fillStyle = p.color;
+      ctx.font = `${p.size}px monospace`;
+      ctx.fillText(p.text, p.x, p.y);
+      ctx.restore();
+      p.x += p.vx;
+      p.y += p.vy;
+      if (p.y < -20) { p.y = H + 20; p.x = Math.random() * W; }
+      if (p.x < -60 || p.x > W + 60) p.x = Math.random() * W;
+    });
+    requestAnimationFrame(drawParticles);
+  }
+  drawParticles();
+</script>
+
+</body>
+</html>
