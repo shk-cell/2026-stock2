@@ -108,16 +108,11 @@ async function refreshData() {
     let uSnap = await getDoc(userRef);
 
     if (!uSnap.exists()) {
-      const initialData = {
-        cash: 70000,
-        totalAsset: 70000,
-        nickname: user.email.split('@')[0],
-        role: "student",
-        createdAt: new Date()
-      };
-      await setDoc(userRef, initialData);
-      uSnap = await getDoc(userRef);
-      alert("신규 계정 초기 자금 $70,000가 지급되었습니다.");
+      // 계정이 없으면 관리자에게 문의하도록 안내
+      alert("계정 정보를 찾을 수 없습니다. 선생님께 문의하세요.");
+      await signOut(auth);
+      window.location.href = "login.html";
+      return;
     }
     
     const userData = uSnap.data();
@@ -197,7 +192,7 @@ async function refreshData() {
 
     const total = (userData.cash || 0) + stockTotal;
     if($("totalAssetsText")) $("totalAssetsText").textContent = money(total);
-    await setDoc(userRef, { totalAsset: total }, { merge: true });
+    // totalAsset 업데이트는 Cloud Function(스케줄러)에서 처리
 
     await updateRankingAndHistory(user.email, userData.school);
 
@@ -261,3 +256,4 @@ onAuthStateChanged(auth, (u) => {
     window.location.href = "login.html";
   }
 });
+
