@@ -22,7 +22,7 @@ const auth = getAuth(app);
 const CREATE_USER_URL = "https://asia-northeast3-stock2-c7470.cloudfunctions.net/createUser";
 
 // ── HEAD ADMIN 이메일 (본인 계정으로 교체하세요) ──────────────
-const HEAD_ADMIN_EMAIL = "YOUR_HEAD_ADMIN_EMAIL@example.com";
+const HEAD_ADMIN_EMAIL = "shk@bp.icems.kr";
 
 let currentRole  = null;
 let currentSchool = null;
