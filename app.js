@@ -172,14 +172,14 @@ async function refreshData() {
         html: `
           <div class="item-flex">
             <div style="flex:1; overflow:hidden;">
-              <div style="margin-bottom:2px;"><b style="font-size:14px;">${s.id} (${d.qty}주)</b></div>
-              <div style="font-size:11.5px; white-space:nowrap;">
-                <span style="color:#888;">매수 ${buyP ? money(buyP) : '미기록'}</span> | 
-                <span style="font-weight:bold;">현재 ${money(currentPrice)}</span> | 
-                <span style="color:${color}; font-weight:bold;">${profitRateText}</span>
+              <div class="port-name">${s.id} <span style="font-weight:400; color:var(--muted); font-size:12px;">${d.qty}주</span></div>
+              <div class="port-detail">
+                매수 ${buyP ? money(buyP) : '미기록'} &nbsp;·&nbsp;
+                현재 <b style="color:var(--txt);">${money(currentPrice)}</b> &nbsp;·&nbsp;
+                <span style="color:${color}; font-weight:700;">${profitRateText}</span>
               </div>
             </div>
-            <button onclick="window.sellStock('${s.id}', ${currentPrice})" class="btn btn-trade btn-sell btn-action" style="height:36px; font-size:13px;" ${currentPrice === 0 ? 'disabled' : ''}>매도</button>
+            <button onclick="window.sellStock('${s.id}', ${currentPrice})" class="btn btn-sell" style="height:34px; font-size:12px; padding:0 12px;" ${currentPrice === 0 ? 'disabled' : ''}>매도</button>
           </div>`,
         value: val
       };
@@ -223,18 +223,22 @@ async function updateRankingAndHistory(email, school) {
 
     let rHtml = "";
     users.forEach((rd, i) => {
-      rHtml += `<div class="item-flex"><span>${i + 1}. ${rd.nickname || rd.id.split('@')[0]}</span><b>${money(rd.totalAsset)}</b></div>`;
+      const rankClass = i === 0 ? "r1" : i === 1 ? "r2" : i === 2 ? "r3" : "";
+      const medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}`;
+      rHtml += `<div class="rank-row"><div class="rank-num ${rankClass}">${medal}</div><div style="flex:1; font-size:13px;">${rd.nickname || rd.id.split('@')[0]}</div><div class="rank-asset">${money(rd.totalAsset)}</div></div>`;
     });
-    if($("rankingList")) $("rankingList").innerHTML = rHtml || "랭킹 없음";
+    if($("rankingList")) $("rankingList").innerHTML = rHtml || '<div class="empty">랭킹 없음</div>';
 
     const hSnaps = await getDocs(query(collection(db, "users", email, "history"), orderBy("timestamp", "desc"), limit(10)));
     let hHtml = "";
     hSnaps.docs.forEach(doc => {
-      const h = doc.data(); 
-      const typeLabel = (h.type === 'BUY' || h.type === '매수') ? '🔴 매수' : '🔵 매도';
-      hHtml += `<div class="item-flex" style="font-size:12px;"><span>${typeLabel} ${h.symbol}</span><span>${h.qty}주 (${money(h.price)})</span></div>`;
+      const h = doc.data();
+      const isBuy = h.type === 'BUY' || h.type === '매수';
+      const typeLabel = isBuy ? '🔴 매수' : '🔵 매도';
+      const typeColor = isBuy ? 'var(--up)' : 'var(--down)';
+      hHtml += `<div class="item-flex"><span style="font-size:12px; color:${typeColor}; font-weight:700;">${typeLabel} <span style="color:var(--txt);">${h.symbol}</span></span><span style="font-size:11px; color:var(--muted);">${h.qty}주 · ${money(h.price)}</span></div>`;
     });
-    if($("transactionList")) $("transactionList").innerHTML = hHtml || "내역 없음";
+    if($("transactionList")) $("transactionList").innerHTML = hHtml || '<div class="empty">거래 내역 없음</div>';
   } catch(e) { 
     console.error("랭킹/내역 로딩 실패:", e); 
   }
