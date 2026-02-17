@@ -3,138 +3,254 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>부평중학교 모의투자 시스템</title>
+  <title>모의투자 시스템</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
-    :root { 
-      --bg: #0b0f14; 
-      --card: rgba(18, 25, 35, 0.85); 
-      --line: #1e2a3a; 
-      --muted: #93a4b8; 
-      --txt: #eaf0f7; 
-      --pri: #2b7cff; 
-      --warn: #ffd479; 
-      --up: #ff4d4d; 
-      --down: #4d94ff; 
-      --zero: #888888;
+    :root {
+      --bg: #070a0f;
+      --card: rgba(13,18,26,0.92);
+      --line: #1e2d3d;
+      --line2: #243444;
+      --muted: #6b8099;
+      --txt: #e2eaf4;
+      --pri: #2b7cff;
+      --warn: #ffd479;
+      --up: #ff4455;
+      --down: #2299ff;
+      --zero: #556677;
+      --green: #00cc88;
+      --accent: #00d4ff;
     }
-    * { box-sizing: border-box; }
-    body { 
-      margin: 0; 
-      font-family: system-ui, sans-serif; 
-      background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('images/background.png'); 
-      background-size: cover;
-      background-position: center;
-      background-attachment: fixed;
-      color: var(--txt); 
-      line-height: 1.5; 
-      min-height: 100vh;
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Noto Sans KR', sans-serif;
+      background: var(--bg); color: var(--txt);
+      min-height: 100vh; overflow-x: hidden;
     }
-    .wrap { max-width: 520px; margin: 20px auto; padding: 0 16px; }
-    .card { 
-      background: var(--card); 
-      border: 1px solid var(--line); 
-      border-radius: 20px; 
-      padding: 24px; 
-      box-shadow: 0 20px 40px rgba(0,0,0,0.5); 
-      backdrop-filter: blur(12px); 
+    body::before {
+      content: ''; position: fixed; inset: 0;
+      background-image:
+        linear-gradient(rgba(43,124,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(43,124,255,0.03) 1px, transparent 1px);
+      background-size: 44px 44px;
+      pointer-events: none; z-index: 0;
     }
-    h1 { margin: 0 0 8px; font-size: 20px; text-align: center; color: var(--pri); }
-    label { display: block; margin-top: 24px; font-size: 12px; color: var(--pri); font-weight: 700; text-transform: uppercase; }
-    
-    .trade-input-group {
-      display: flex;
-      gap: 6px;
-      margin-top: 6px;
+    .topbar {
+      position: sticky; top: 0; z-index: 50;
+      background: rgba(7,10,15,0.93);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--line);
+      padding: 0 20px; height: 56px;
+      display: flex; align-items: center; justify-content: space-between;
     }
-    input { 
-      width: 100%; 
-      height: 44px; 
-      border-radius: 12px; 
-      border: 1px solid var(--line); 
-      background: rgba(14, 20, 29, 0.8); 
-      color: var(--txt); 
-      padding: 0 16px; 
-      outline: none; 
+    .topbar-logo { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 800; letter-spacing: 3px; color: var(--accent); }
+    .topbar-right { display: flex; align-items: center; gap: 10px; }
+    #userNickname { font-size: 12px; color: var(--muted); }
+    #logoutBtn {
+      background: transparent; border: 1px solid var(--line2);
+      color: var(--muted); font-size: 11px; padding: 4px 10px;
+      border-radius: 6px; cursor: pointer;
+      font-family: 'Noto Sans KR', sans-serif; transition: all 0.2s;
     }
-    .btn { height: 44px; border-radius: 10px; border: 0; color: white; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-    .btn:hover { filter: brightness(1.1); }
-    .btn:disabled { opacity: 0.2; cursor: not-allowed; }
-    
-    .btn-action { width: 80px; font-size: 14px; flex-shrink: 0; }
+    #logoutBtn:hover { border-color: var(--accent); color: var(--accent); }
+    .wrap { max-width: 560px; margin: 0 auto; padding: 20px 16px 60px; position: relative; z-index: 1; }
+    #globalRefreshBtn {
+      width: 100%; height: 44px;
+      background: rgba(43,124,255,0.08);
+      border: 1px solid rgba(43,124,255,0.3);
+      border-radius: 12px; color: var(--pri);
+      font-weight: 700; font-size: 13px;
+      cursor: pointer; font-family: 'Noto Sans KR', sans-serif;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: all 0.2s;
+    }
+    #globalRefreshBtn:hover { background: rgba(43,124,255,0.15); border-color: var(--pri); }
+    .expire-row { text-align: center; margin-top: 8px; margin-bottom: 16px; }
+    .expire-hint { font-size: 11px; color: var(--muted); margin-bottom: 4px; }
+    #expireMsg {
+      font-size: 13px; color: var(--warn); font-family: monospace; font-weight: 700;
+      background: rgba(255,212,121,0.08); border: 1px solid rgba(255,212,121,0.2);
+      padding: 5px 14px; border-radius: 8px; display: inline-block;
+    }
+    .stat-row { display: flex; gap: 10px; margin-bottom: 14px; }
+    .stat-card {
+      flex: 1; background: var(--card); border: 1px solid var(--line);
+      border-radius: 16px; padding: 16px; backdrop-filter: blur(8px);
+      position: relative; overflow: hidden;
+    }
+    .stat-card::before {
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(90deg, transparent, rgba(43,124,255,0.4), transparent);
+    }
+    .stat-label { font-size: 10px; letter-spacing: 1.5px; text-transform: uppercase; color: var(--muted); margin-bottom: 6px; }
+    .stat-value { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 800; }
+    #cashText { color: var(--green); }
+    #totalAssetsText { color: var(--accent); }
+    .update-notice {
+      background: rgba(0,212,255,0.05); border: 1px solid rgba(0,212,255,0.15);
+      border-radius: 12px; padding: 12px 16px; margin-bottom: 16px;
+      font-size: 11.5px; color: var(--muted); line-height: 1.8;
+    }
+    .update-notice b { color: var(--accent); }
+    .time-badge {
+      display: inline-block; background: rgba(0,212,255,0.1);
+      border: 1px solid rgba(0,212,255,0.2); border-radius: 6px;
+      padding: 1px 8px; font-size: 11px; color: var(--accent);
+      font-family: monospace; font-weight: 700; margin: 0 2px;
+    }
+    .sec-label {
+      font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: var(--pri);
+      margin: 20px 0 8px; display: flex; align-items: center; gap: 8px;
+    }
+    .sec-label::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, var(--line), transparent); }
+    .trade-input-group { display: flex; gap: 6px; }
+    input {
+      height: 44px; border-radius: 12px; border: 1px solid var(--line2);
+      background: rgba(10,16,24,0.8); color: var(--txt);
+      padding: 0 16px; font-size: 14px;
+      font-family: 'Noto Sans KR', sans-serif; outline: none; transition: border-color 0.2s;
+    }
+    input:focus { border-color: var(--pri); }
+    input::placeholder { color: #2a3a4a; }
+    .btn {
+      height: 44px; border-radius: 10px; border: 0; color: white;
+      font-weight: 700; font-size: 13px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.2s; font-family: 'Noto Sans KR', sans-serif;
+      white-space: nowrap; padding: 0 16px;
+    }
+    .btn:hover { filter: brightness(1.15); transform: translateY(-1px); }
+    .btn:active { transform: translateY(0); }
+    .btn:disabled { opacity: 0.2; cursor: not-allowed; transform: none; filter: none; }
+    .btn-query { background: #1e2d3d; border: 1px solid var(--line2); }
     .btn-buy { background: var(--up); }
     .btn-sell { background: var(--pri); }
-    .btn-refresh { background: #1e2a3a; border: 1px solid var(--pri); color: var(--pri); width: 100%; margin: 10px 0; }
-    
-    .hidden { display: none !important; }
-    .guide-box { background: rgba(26, 34, 44, 0.8); border: 1px solid var(--line); border-radius: 12px; padding: 14px; margin-top: 10px; font-size: 12px; line-height: 1.6; }
-    .stat-card { background: rgba(26, 34, 44, 0.8); border: 1px solid var(--line); border-radius: 16px; padding: 14px; flex: 1; }
-    .list-box { background: rgba(26, 34, 44, 0.8); border-radius: 16px; padding: 12px; margin-top: 8px; border: 1px solid var(--line); }
-    .item-flex { display: flex; justify-content: space-between; align-items: center; padding: 12px 0; border-bottom: 1px solid #243142; gap: 8px; }
+    .guide-box {
+      background: rgba(10,16,24,0.9); border: 1px solid var(--line);
+      border-radius: 12px; padding: 14px; margin-top: 10px;
+      font-size: 12px; line-height: 1.8; color: var(--muted);
+    }
+    .guide-box b { color: var(--txt); }
+    .guide-box .warn { color: var(--warn); font-size: 11px; }
+    .guide-box .rate-line {
+      color: var(--pri); font-weight: 700; padding-top: 8px;
+      margin-top: 8px; border-top: 1px solid var(--line);
+    }
+    #qOutBox {
+      margin-top: 10px; padding: 14px 18px;
+      background: rgba(255,212,121,0.05);
+      border: 1px solid rgba(255,212,121,0.2);
+      border-left: 3px solid var(--warn);
+      border-radius: 12px; display: none;
+      align-items: center; justify-content: space-between;
+    }
+    #qSymbolText { font-size: 11px; color: var(--muted); font-weight: 700; margin-bottom: 2px; }
+    #qPriceText { font-family: 'Syne', sans-serif; font-size: 22px; font-weight: 800; color: var(--warn); }
+    .list-box {
+      background: var(--card); border: 1px solid var(--line);
+      border-radius: 14px; padding: 4px 14px; backdrop-filter: blur(8px);
+    }
+    .item-flex {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 11px 0; border-bottom: 1px solid rgba(30,45,61,0.8); gap: 8px;
+    }
     .item-flex:last-child { border: 0; }
-    #qOutBox { margin-top: 10px; padding: 15px; background: #1e2a3a; border-radius: 12px; display: none; align-items: center; justify-content: space-between; border-left: 4px solid var(--warn); }
-    #expireMsg { font-size: 14px; color: var(--warn); font-family: monospace; font-weight: bold; background: rgba(0,0,0,0.3); padding: 6px 12px; border-radius: 8px; display: inline-block; }
+    .rank-row {
+      display: flex; align-items: center; gap: 12px;
+      padding: 10px 0; border-bottom: 1px solid rgba(30,45,61,0.8);
+    }
+    .rank-row:last-child { border: 0; }
+    .rank-num { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 800; width: 24px; text-align: center; color: var(--muted); }
+    .rank-num.r1 { color: #f5c842; }
+    .rank-num.r2 { color: #c0c0c0; }
+    .rank-num.r3 { color: #cd7f32; }
+    .rank-asset { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--accent); }
+    .empty { text-align: center; padding: 24px; font-size: 12px; color: var(--muted); }
   </style>
 </head>
 <body>
-  <div class="wrap">
-    <div class="card">
 
-      <!-- 대시보드 (로그인 후 표시) -->
-      <section id="dashView">
-        <div style="display: flex; justify-content: space-between; align-items: center;">
-          <b id="userNickname" style="font-size:15px; color:var(--pri);">-</b>
-          <button id="logoutBtn" style="background:none; border:1px solid var(--line); color:var(--muted); font-size:11px; padding:4px 8px; border-radius:6px; cursor:pointer;">로그아웃</button>
-        </div>
-
-        <button id="globalRefreshBtn" class="btn btn-refresh">현재 시세 업데이트 ↻</button>
-        <div style="text-align:center; margin-bottom: 10px;">
-          <div style="font-size:11px; color:var(--muted); margin-bottom:5px;">현재 시세 업데이트를 해야 매도 / 매수 버튼이 활성화 됩니다.</div>
-          <div id="expireMsg">시세 갱신 필요</div>
-        </div>
-
-        <div style="display:flex; gap:10px; margin-top:15px;">
-          <div class="stat-card"><div>보유 현금</div><div id="cashText" style="font-size:18px; font-weight:800;">$0.00</div></div>
-          <div class="stat-card"><div>총 자산</div><div id="totalAssetsText" style="font-size:18px; font-weight:800;">$0.00</div></div>
-        </div>
-
-        <label>주식 조회 및 거래</label>
-        <div class="trade-input-group">
-          <input id="qSymbol" placeholder="종목코드 입력" style="flex:1;" />
-          <button id="qBtn" class="btn btn-action" style="background:#3a4452;">조회</button>
-          <button id="buyBtn" class="btn btn-action btn-buy" disabled>매수</button>
-        </div>
-
-        <div class="guide-box">
-          <b>🇺🇸 미국 주식:</b> 종목코드 그대로 입력<br>
-          - 예: 애플: <b>AAPL</b>, 테슬라: <b>TSLA</b>, 엔비디아: <b>NVDA</b><br>
-          <span style="color:var(--warn); font-size: 11px;">※ 미 증시 개장: 23:30 ~ 06:00 (한국시간)</span><br><br>
-
-          <b>🇰🇷 한국 주식:</b> 종목코드 뒤에 <b>.KS / .KQ</b> 붙이기<br>
-          - 예: 삼성전자: <b>005930.KS</b>, 에코프로: <b>086520.KQ</b><br>
-          <span style="color:var(--warn); font-size: 11px;">※ 한 증시 개장: 09:00 ~ 15:30 (평일)</span><br><br>
-
-          <div style="color:var(--pri); font-weight:bold; padding-top:8px; border-top:1px solid var(--line);">
-            ※ 한국주식은 현재 원화환율을 반영하여 자동으로 달러가격으로 전환됩니다.
-            <span id="currentRateText" style="color:var(--warn);">(현재 환율: 불러오는 중...)</span>
-          </div>
-        </div>
-
-        <div id="qOutBox">
-          <div><div id="qSymbolText" style="font-size:12px; color:var(--muted); font-weight:bold;">-</div><div id="qPriceText" style="font-size:20px; font-weight:800; color:var(--warn);">$0.00</div></div>
-        </div>
-
-        <label>📦 내 포트폴리오</label>
-        <div id="portfolioList" class="list-box"></div>
-
-        <label>🏆 실시간 랭킹</label>
-        <div id="rankingList" class="list-box"></div>
-
-        <label>🕒 최근 거래 내역</label>
-        <div id="transactionList" class="list-box"></div>
-      </section>
-
+  <div class="topbar">
+    <span class="topbar-logo">STOCKLAB</span>
+    <div class="topbar-right">
+      <span id="userNickname">-</span>
+      <button id="logoutBtn">로그아웃</button>
     </div>
   </div>
+
+  <div class="wrap">
+
+    <button id="globalRefreshBtn">↻ 현재 시세 업데이트</button>
+    <div class="expire-row">
+      <div class="expire-hint">매수/매도 버튼을 활성화하려면 시세 업데이트가 필요합니다.</div>
+      <div id="expireMsg">시세 갱신 필요</div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="stat-label">보유 현금</div>
+        <div id="cashText" class="stat-value">$0.00</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">총 자산</div>
+        <div id="totalAssetsText" class="stat-value">$0.00</div>
+      </div>
+    </div>
+
+    <div class="update-notice">
+      📊 <b>자산 & 랭킹 자동 업데이트</b><br>
+      🇰🇷 한국 장마감 후 <span class="time-badge">16:30 KST</span> 평일 1회
+      &nbsp;·&nbsp;
+      🇺🇸 미국 장마감 후 <span class="time-badge">06:00 KST</span> 평일 1회<br>
+      총 자산과 랭킹은 하루 최대 2회 자동으로 반영됩니다.
+    </div>
+
+    <div class="sec-label">주식 조회 및 거래</div>
+    <div class="trade-input-group">
+      <input id="qSymbol" placeholder="종목코드 입력 (예: AAPL)" style="flex:1;" />
+      <button id="qBtn" class="btn btn-query">조회</button>
+      <button id="buyBtn" class="btn btn-buy" disabled>매수</button>
+    </div>
+
+    <div class="guide-box">
+      <b>🇺🇸 미국 주식</b> — 종목코드 그대로 입력<br>
+      예: 애플 <b>AAPL</b> · 테슬라 <b>TSLA</b> · 엔비디아 <b>NVDA</b><br>
+      <span class="warn">※ 미 증시 개장: 23:30 ~ 06:00 (한국시간)</span><br><br>
+      <b>🇰🇷 한국 주식</b> — 종목코드 뒤에 <b>.KS</b> / <b>.KQ</b> 붙이기<br>
+      예: 삼성전자 <b>005930.KS</b> · 에코프로 <b>086520.KQ</b><br>
+      <span class="warn">※ 한 증시 개장: 09:00 ~ 15:30 (평일)</span>
+      <div class="rate-line">
+        ※ 한국주식은 실시간 환율로 자동 달러 환산
+        <span id="currentRateText" style="color:var(--warn);">(환율 로딩 중...)</span>
+      </div>
+    </div>
+
+    <div id="qOutBox">
+      <div>
+        <div id="qSymbolText">-</div>
+        <div id="qPriceText">$0.00</div>
+      </div>
+    </div>
+
+    <div class="sec-label">📦 내 포트폴리오</div>
+    <div id="portfolioList" class="list-box">
+      <div class="empty">보유 주식이 없습니다.</div>
+    </div>
+
+    <div class="sec-label">🏆 학교 랭킹</div>
+    <div id="rankingList" class="list-box">
+      <div class="empty">로딩 중...</div>
+    </div>
+
+    <div class="sec-label">🕒 최근 거래 내역</div>
+    <div id="transactionList" class="list-box">
+      <div class="empty">거래 내역이 없습니다.</div>
+    </div>
+
+  </div>
+
   <script type="module" src="./app.js"></script>
 </body>
 </html>
