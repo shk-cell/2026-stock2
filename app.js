@@ -209,24 +209,21 @@ async function refreshData() {
 // 랭킹: 같은 학교 학생끼리만 표시
 async function updateRankingAndHistory(email, school) {
   try {
-    // 학교 정보가 있으면 같은 학교만, 없으면 전체 (하위 호환)
-    let rankQuery;
-    if (school) {
-      rankQuery = query(
-        collection(db, "users"),
-        where("school", "==", school),
-        orderBy("totalAsset", "desc"),
-        limit(10)
-      );
-    } else {
-      rankQuery = query(collection(db, "users"), orderBy("totalAsset", "desc"), limit(10));
-    }
+    // 전체 유저 가져온 뒤 클라이언트에서 학교 필터링 + 정렬
+    const allSnaps = await getDocs(collection(db, "users"));
+    let users = [];
+    allSnaps.forEach(d => {
+      const data = d.data();
+      if (!school || data.school === school) {
+        users.push({ id: d.id, ...data });
+      }
+    });
+    users.sort((a, b) => (b.totalAsset || 0) - (a.totalAsset || 0));
+    users = users.slice(0, 10);
 
-    const rSnaps = await getDocs(rankQuery);
     let rHtml = "";
-    rSnaps.docs.forEach((d, i) => {
-      const rd = d.data();
-      rHtml += `<div class="item-flex"><span>${i + 1}. ${rd.nickname || d.id.split('@')[0]}</span><b>${money(rd.totalAsset)}</b></div>`;
+    users.forEach((rd, i) => {
+      rHtml += `<div class="item-flex"><span>${i + 1}. ${rd.nickname || rd.id.split('@')[0]}</span><b>${money(rd.totalAsset)}</b></div>`;
     });
     if($("rankingList")) $("rankingList").innerHTML = rHtml || "랭킹 없음";
 
