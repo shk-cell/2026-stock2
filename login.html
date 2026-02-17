@@ -255,38 +255,6 @@
     }
     .info-row b { color: var(--pri); }
 
-    /* ── 하단 시세 티커 ── */
-    .ticker-bar {
-      position: fixed;
-      bottom: 0; left: 0; right: 0;
-      height: 32px;
-      background: rgba(7,10,15,0.9);
-      border-top: 1px solid var(--line);
-      display: flex;
-      align-items: center;
-      overflow: hidden;
-      z-index: 10;
-    }
-    .ticker-track {
-      display: flex;
-      gap: 40px;
-      animation: ticker 30s linear infinite;
-      white-space: nowrap;
-      padding-left: 100%;
-    }
-    @keyframes ticker {
-      from { transform: translateX(0); }
-      to   { transform: translateX(-50%); }
-    }
-    .ticker-item {
-      font-size: 11px;
-      font-family: monospace;
-      letter-spacing: 0.5px;
-    }
-    .ticker-item .sym { color: var(--muted); margin-right: 5px; }
-    .ticker-item .up  { color: var(--up); }
-    .ticker-item .dn  { color: #4d94ff; }
-
     @media (max-width: 440px) {
       .card { padding: 24px 20px; border-radius: 18px; }
       .logo-title { font-size: 19px; }
@@ -345,31 +313,6 @@
   </div>
 </div>
 
-<!-- 하단 티커 -->
-<div class="ticker-bar">
-  <div class="ticker-track" id="tickerTrack">
-    <span class="ticker-item"><span class="sym">AAPL</span><span class="up">▲ 213.49</span></span>
-    <span class="ticker-item"><span class="sym">TSLA</span><span class="dn">▼ 248.23</span></span>
-    <span class="ticker-item"><span class="sym">NVDA</span><span class="up">▲ 875.40</span></span>
-    <span class="ticker-item"><span class="sym">AMZN</span><span class="up">▲ 192.30</span></span>
-    <span class="ticker-item"><span class="sym">005930.KS</span><span class="dn">▼ 73,400</span></span>
-    <span class="ticker-item"><span class="sym">MSFT</span><span class="up">▲ 412.65</span></span>
-    <span class="ticker-item"><span class="sym">GOOGL</span><span class="up">▲ 178.02</span></span>
-    <span class="ticker-item"><span class="sym">086520.KQ</span><span class="up">▲ 84,500</span></span>
-    <span class="ticker-item"><span class="sym">META</span><span class="up">▲ 551.30</span></span>
-    <span class="ticker-item"><span class="sym">005380.KS</span><span class="dn">▼ 212,000</span></span>
-    <!-- 루프를 위한 복사본 -->
-    <span class="ticker-item"><span class="sym">AAPL</span><span class="up">▲ 213.49</span></span>
-    <span class="ticker-item"><span class="sym">TSLA</span><span class="dn">▼ 248.23</span></span>
-    <span class="ticker-item"><span class="sym">NVDA</span><span class="up">▲ 875.40</span></span>
-    <span class="ticker-item"><span class="sym">AMZN</span><span class="up">▲ 192.30</span></span>
-    <span class="ticker-item"><span class="sym">005930.KS</span><span class="dn">▼ 73,400</span></span>
-    <span class="ticker-item"><span class="sym">MSFT</span><span class="up">▲ 412.65</span></span>
-    <span class="ticker-item"><span class="sym">GOOGL</span><span class="up">▲ 178.02</span></span>
-    <span class="ticker-item"><span class="sym">086520.KQ</span><span class="up">▲ 84,500</span></span>
-    <span class="ticker-item"><span class="sym">META</span><span class="up">▲ 551.30</span></span>
-    <span class="ticker-item"><span class="sym">005380.KS</span><span class="dn">▼ 212,000</span></span>
-  </div>
 </div>
 
 <script type="module">
