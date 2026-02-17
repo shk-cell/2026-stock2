@@ -22,7 +22,7 @@ const auth = getAuth(app);
 const CREATE_USER_URL = "https://asia-northeast3-stock2-c7470.cloudfunctions.net/createUser";
 
 // ── HEAD ADMIN 이메일 (본인 계정으로 교체하세요) ──────────────
-const HEAD_ADMIN_EMAIL = "shk@bp.icems.kr";
+const HEAD_ADMIN_EMAIL = "YOUR_HEAD_ADMIN_EMAIL@example.com";
 
 let currentRole  = null;
 let currentSchool = null;
@@ -357,19 +357,26 @@ window.deleteStudent = async function (email, name) {
 window.loadSchoolRanking = async function () {
   if (!currentSchool) return;
   try {
-    const snap = await getDocs(
-      query(collection(db, "users"), where("school", "==", currentSchool), where("role", "==", "student"), orderBy("totalAsset", "desc"), limit(30))
-    );
-    const listEl = $("schoolRankList");
-    if (snap.empty) { listEl.innerHTML = `<div class="empty-state">랭킹 데이터가 없습니다.</div>`; return; }
-    listEl.innerHTML = snap.docs.map((d, i) => {
+    const allSnaps = await getDocs(collection(db, "users"));
+    let users = [];
+    allSnaps.forEach(d => {
       const data = d.data();
+      if (data.school === currentSchool) {
+        users.push({ id: d.id, ...data });
+      }
+    });
+    users.sort((a, b) => (b.totalAsset || 0) - (a.totalAsset || 0));
+    users = users.slice(0, 30);
+
+    const listEl = $("schoolRankList");
+    if (!users.length) { listEl.innerHTML = `<div class="empty-state">랭킹 데이터가 없습니다.</div>`; return; }
+    listEl.innerHTML = users.map((data, i) => {
       const rankClass = i === 0 ? "r1" : i === 1 ? "r2" : i === 2 ? "r3" : "";
       const medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}`;
       return `
         <div class="rank-item">
           <div class="rank-num ${rankClass}">${medal}</div>
-          <div class="rank-info"><div class="rank-name">${data.nickname || d.id}</div><div class="rank-school">${d.id}</div></div>
+          <div class="rank-info"><div class="rank-name">${data.nickname || data.id}</div><div class="rank-school">${data.id}</div></div>
           <div class="rank-asset">${money(data.totalAsset)}</div>
         </div>`;
     }).join("");
@@ -378,24 +385,31 @@ window.loadSchoolRanking = async function () {
 
 window.loadAllRanking = async function () {
   try {
-    const snap = await getDocs(
-      query(collection(db, "users"), where("role", "==", "student"), orderBy("totalAsset", "desc"), limit(30))
-    );
-    const schoolsSnap = await getDocs(collection(db, "schools"));
+    const [allSnaps, schoolsSnap] = await Promise.all([
+      getDocs(collection(db, "users")),
+      getDocs(collection(db, "schools"))
+    ]);
+
     const schoolMap = {};
     schoolsSnap.forEach(s => { schoolMap[s.id] = s.data().name; });
 
+    let users = [];
+    allSnaps.forEach(d => {
+      users.push({ id: d.id, ...d.data() });
+    });
+    users.sort((a, b) => (b.totalAsset || 0) - (a.totalAsset || 0));
+    users = users.slice(0, 30);
+
     const listEl = $("allRankList");
-    if (snap.empty) { listEl.innerHTML = `<div class="empty-state">랭킹 데이터가 없습니다.</div>`; return; }
-    listEl.innerHTML = snap.docs.map((d, i) => {
-      const data = d.data();
+    if (!users.length) { listEl.innerHTML = `<div class="empty-state">랭킹 데이터가 없습니다.</div>`; return; }
+    listEl.innerHTML = users.map((data, i) => {
       const schoolName = schoolMap[data.school] || data.school || "미지정";
       const rankClass = i === 0 ? "r1" : i === 1 ? "r2" : i === 2 ? "r3" : "";
       const medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}`;
       return `
         <div class="rank-item">
           <div class="rank-num ${rankClass}">${medal}</div>
-          <div class="rank-info"><div class="rank-name">${data.nickname || d.id}</div><div class="rank-school">${schoolName}</div></div>
+          <div class="rank-info"><div class="rank-name">${data.nickname || data.id}</div><div class="rank-school">${schoolName}</div></div>
           <div class="rank-asset">${money(data.totalAsset)}</div>
         </div>`;
     }).join("");
