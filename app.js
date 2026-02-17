@@ -15,8 +15,8 @@ const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 const auth = getAuth(app);
 
-const TRADE_URL = "https://asia-northeast3-stock-62c76.cloudfunctions.net/tradeStock";
-const QUOTE_URL = "https://asia-northeast3-stock-62c76.cloudfunctions.net/quote";
+const TRADE_URL = "https://asia-northeast3-stock2-c7470.cloudfunctions.net/tradeStock";
+const QUOTE_URL = "https://asia-northeast3-stock2-c7470.cloudfunctions.net/quote";
 
 const $ = (id) => document.getElementById(id);
 const money = (v) => `$${Number(v || 0).toLocaleString(undefined, {minimumFractionDigits:2, maximumFractionDigits:2})}`;
