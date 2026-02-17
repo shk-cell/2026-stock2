@@ -19,7 +19,7 @@ const app = initializeApp(firebaseConfig);
 const db  = getFirestore(app);
 const auth = getAuth(app);
 
-const CREATE_USER_URL = "https://asia-northeast3-stock-62c76.cloudfunctions.net/createUser";
+const CREATE_USER_URL = "https://asia-northeast3-stock2-c7470.cloudfunctions.net/createUser";
 
 // ── HEAD ADMIN 이메일 (본인 계정으로 교체하세요) ──────────────
 const HEAD_ADMIN_EMAIL = "tgr06122@gmail.com";
