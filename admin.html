@@ -1,3 +1,4 @@
+
 <!doctype html>
 <html lang="ko">
 <head>
@@ -172,7 +173,7 @@
     <div class="tab-btn head-only" data-tab="middleAdmins"  onclick="switchTab('middleAdmins')">👤 미들어드민 관리</div>
     <div class="tab-btn middle-only" data-tab="myStudents"  onclick="switchTab('myStudents')">🎓 학생 관리</div>
     <div class="tab-btn middle-only" data-tab="schoolRanking" onclick="switchTab('schoolRanking')">🏆 학교 랭킹</div>
-    <div class="tab-btn" data-tab="allRanking"              onclick="switchTab('allRanking')">🌐 전체 랭킹</div>
+    <div class="tab-btn head-only" data-tab="allRanking"              onclick="switchTab('allRanking')">🌐 전체 랭킹</div>
   </div>
 
   <!-- HEAD: 전체 현황 -->
@@ -264,7 +265,7 @@
   </div>
 
   <!-- 공통: 전체 랭킹 -->
-  <div id="tab-allRanking" class="tab-content fade-in">
+  <div id="tab-allRanking" class="tab-content head-only fade-in">
     <div class="section-header">
       <div><div class="section-title">전체 랭킹</div><div class="section-sub">모든 학교 통합 TOP 30</div></div>
       <button class="btn btn-outline btn-sm" onclick="loadAllRanking()">↻ 새로고침</button>
