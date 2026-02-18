@@ -23,7 +23,7 @@ const CREATE_USER_URL = "https://asia-northeast3-stock2-c7470.cloudfunctions.net
 
 // ── HEAD ADMIN 이메일 (본인 계정으로 교체하세요) ──────────────
 const HEAD_ADMIN_EMAIL = "shk@bp.icems.kr";
-
+const ADMIN_RANKING_URL = "https://asia-northeast3-stock2-c7470.cloudfunctions.net/getAdminRanking";
 let currentRole  = null;
 let currentSchool = null;
 let currentSchoolName = null;
