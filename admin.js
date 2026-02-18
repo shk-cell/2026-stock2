@@ -357,27 +357,23 @@ window.deleteStudent = async function (email, name) {
 window.loadSchoolRanking = async function () {
   if (!currentSchool) return;
   try {
-    const allSnaps = await getDocs(collection(db, "users"));
-    let users = [];
-    allSnaps.forEach(d => {
-      const data = d.data();
-      if (data.school === currentSchool) {
-        users.push({ id: d.id, ...data });
-      }
+    const idToken = await auth.currentUser.getIdToken();
+    const res = await fetch(`${ADMIN_RANKING_URL}?type=school&school=${currentSchool}`, {
+      headers: { "Authorization": `Bearer ${idToken}` }
     });
-    users.sort((a, b) => (b.totalAsset || 0) - (a.totalAsset || 0));
-    users = users.slice(0, 30);
-
+    const data = await res.json();
     const listEl = $("schoolRankList");
-    if (!users.length) { listEl.innerHTML = `<div class="empty-state">랭킹 데이터가 없습니다.</div>`; return; }
-    listEl.innerHTML = users.map((data, i) => {
+    if (!data.ok || !data.ranking.length) {
+      listEl.innerHTML = `<div class="empty-state">랭킹 데이터가 없습니다.</div>`; return;
+    }
+    listEl.innerHTML = data.ranking.map((rd, i) => {
       const rankClass = i === 0 ? "r1" : i === 1 ? "r2" : i === 2 ? "r3" : "";
       const medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}`;
       return `
         <div class="rank-item">
           <div class="rank-num ${rankClass}">${medal}</div>
-          <div class="rank-info"><div class="rank-name">${data.nickname || data.id}</div><div class="rank-school">${data.id}</div></div>
-          <div class="rank-asset">${money(data.totalAsset)}</div>
+          <div class="rank-info"><div class="rank-name">${rd.nickname}</div><div class="rank-school">${rd.id}</div></div>
+          <div class="rank-asset">${money(rd.totalAsset)}</div>
         </div>`;
     }).join("");
   } catch (e) { $("schoolRankList").innerHTML = `<div class="empty-state">로드 실패</div>`; }
@@ -385,32 +381,23 @@ window.loadSchoolRanking = async function () {
 
 window.loadAllRanking = async function () {
   try {
-    const [allSnaps, schoolsSnap] = await Promise.all([
-      getDocs(collection(db, "users")),
-      getDocs(collection(db, "schools"))
-    ]);
-
-    const schoolMap = {};
-    schoolsSnap.forEach(s => { schoolMap[s.id] = s.data().name; });
-
-    let users = [];
-    allSnaps.forEach(d => {
-      users.push({ id: d.id, ...d.data() });
+    const idToken = await auth.currentUser.getIdToken();
+    const res = await fetch(`${ADMIN_RANKING_URL}?type=all`, {
+      headers: { "Authorization": `Bearer ${idToken}` }
     });
-    users.sort((a, b) => (b.totalAsset || 0) - (a.totalAsset || 0));
-    users = users.slice(0, 30);
-
+    const data = await res.json();
     const listEl = $("allRankList");
-    if (!users.length) { listEl.innerHTML = `<div class="empty-state">랭킹 데이터가 없습니다.</div>`; return; }
-    listEl.innerHTML = users.map((data, i) => {
-      const schoolName = schoolMap[data.school] || data.school || "미지정";
+    if (!data.ok || !data.ranking.length) {
+      listEl.innerHTML = `<div class="empty-state">랭킹 데이터가 없습니다.</div>`; return;
+    }
+    listEl.innerHTML = data.ranking.map((rd, i) => {
       const rankClass = i === 0 ? "r1" : i === 1 ? "r2" : i === 2 ? "r3" : "";
       const medal = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}`;
       return `
         <div class="rank-item">
           <div class="rank-num ${rankClass}">${medal}</div>
-          <div class="rank-info"><div class="rank-name">${data.nickname || data.id}</div><div class="rank-school">${schoolName}</div></div>
-          <div class="rank-asset">${money(data.totalAsset)}</div>
+          <div class="rank-info"><div class="rank-name">${rd.nickname}</div><div class="rank-school">${rd.school}</div></div>
+          <div class="rank-asset">${money(rd.totalAsset)}</div>
         </div>`;
     }).join("");
   } catch (e) { $("allRankList").innerHTML = `<div class="empty-state">로드 실패</div>`; }
