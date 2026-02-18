@@ -373,7 +373,7 @@ window.loadSchoolRanking = async function () {
         <div class="rank-item">
           <div class="rank-num ${rankClass}">${medal}</div>
           <div class="rank-info"><div class="rank-name">${rd.nickname}</div><div class="rank-school">${rd.id}</div></div>
-          <div class="rank-asset">${money(rd.totalAsset)}</div>
+          <div class="rank-asset" style="font-family: 'Noto Sans KR', sans-serif;">${money(rd.totalAsset)}</div>
         </div>`;
     }).join("");
   } catch (e) { $("schoolRankList").innerHTML = `<div class="empty-state">로드 실패</div>`; }
@@ -397,7 +397,7 @@ window.loadAllRanking = async function () {
         <div class="rank-item">
           <div class="rank-num ${rankClass}">${medal}</div>
           <div class="rank-info"><div class="rank-name">${rd.nickname}</div><div class="rank-school">${rd.school}</div></div>
-          <div class="rank-asset">${money(rd.totalAsset)}</div>
+          <div class="rank-asset" style="font-family: 'Noto Sans KR', sans-serif;">${money(rd.totalAsset)}</div>
         </div>`;
     }).join("");
   } catch (e) { $("allRankList").innerHTML = `<div class="empty-state">로드 실패</div>`; }
