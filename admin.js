@@ -6,24 +6,14 @@ import {
 import {
   getAuth, signOut, onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import { firebaseConfig, HEAD_ADMIN_EMAIL, CF_BASE } from "./config.js";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyD0Cl5VyhKivRExMLECf5uR7FhaCOov-s0",
-  authDomain: "stock2-c7470.firebaseapp.com",
-  projectId: "stock2-c7470",
-  storageBucket: "stock2-c7470.firebasestorage.app",
-  messagingSenderId: "283664471206",
-  appId: "1:283664471206:web:3db65c9d1296149b749067",
-};
-const app = initializeApp(firebaseConfig);
-const db  = getFirestore(app);
+const app  = initializeApp(firebaseConfig);
+const db   = getFirestore(app);
 const auth = getAuth(app);
 
-const CREATE_USER_URL = "https://asia-northeast3-stock2-c7470.cloudfunctions.net/createUser";
-
-// ── HEAD ADMIN 이메일 (본인 계정으로 교체하세요) ──────────────
-const HEAD_ADMIN_EMAIL = "shk@bp.icems.kr";
-const ADMIN_RANKING_URL = "https://asia-northeast3-stock2-c7470.cloudfunctions.net/getAdminRanking";
+const CREATE_USER_URL   = `${CF_BASE}/createUser`;
+const ADMIN_RANKING_URL = `${CF_BASE}/getAdminRanking`;
 let currentRole  = null;
 let currentSchool = null;
 let currentSchoolName = null;
@@ -199,12 +189,12 @@ window.addSchool = async function () {
   const name   = $("newSchoolName").value.trim();
   if (!id || !name) return showAlert("schoolAddAlert", "ID와 학교 이름을 모두 입력하세요.", "error");
   if (!/^[a-z0-9\-]+$/.test(id)) return showAlert("schoolAddAlert", "학교 ID는 영문 소문자, 숫자, 하이픈만 사용 가능합니다.", "error");
-  const domain = `${id}.com`; // 학교 ID로 도메인 자동 생성
+  const domain = ($("newSchoolDomain").value.trim()) || `${id}.com`;
   try {
     const ref = doc(db, "schools", id);
     if ((await getDoc(ref)).exists()) return showAlert("schoolAddAlert", "이미 존재하는 학교 ID입니다.", "error");
     await setDoc(ref, { name, domain, createdAt: new Date() });
-    $("newSchoolId").value = $("newSchoolName").value = "";
+    $("newSchoolId").value = $("newSchoolName").value = $("newSchoolDomain").value = "";
     showAlert("schoolAddAlert", `"${name}" 등록 완료 (도메인: @${domain})`, "success");
     loadSchools();
   } catch (e) { showAlert("schoolAddAlert", "등록 실패: " + e.message, "error"); }

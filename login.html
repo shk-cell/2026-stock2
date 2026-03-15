@@ -275,7 +275,7 @@
       </svg>
     </div>
     <span class="logo-title">모의투자 시스템</span>
-    <span class="logo-sub">부평중학교 금융 교육 플랫폼</span>
+    <span class="logo-sub">금융 교육 플랫폼</span>
   </div>
 
   <!-- 로그인 카드 -->
@@ -319,18 +319,7 @@
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
   import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
   import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyD0Cl5VyhKivRExMLECf5uR7FhaCOov-s0",
-    authDomain: "stock2-c7470.firebaseapp.com",
-    projectId: "stock2-c7470",
-    storageBucket: "stock2-c7470.firebasestorage.app",
-    messagingSenderId: "283664471206",
-    appId: "1:283664471206:web:3db65c9d1296149b749067",
-  };
-
-  // ── HEAD ADMIN 이메일 (본인 계정으로 교체) ──────────────────
-  const HEAD_ADMIN_EMAIL = "shk@bp.icems.kr";
+  import { firebaseConfig, HEAD_ADMIN_EMAIL } from "./config.js";
 
   const app = initializeApp(firebaseConfig);
   const db  = getFirestore(app);
