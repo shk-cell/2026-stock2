@@ -21,6 +21,8 @@ let currentSchoolDomain = null;
 
 const $ = (id) => document.getElementById(id);
 const money = (v) => `$${Number(v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+// onclick 속성 내 문자열 인수 이스케이프 (작은따옴표·백슬래시)
+const jsq = (s) => String(s).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
 
 function showAlert(id, msg, type = "info") {
   const el = $(id);
@@ -165,7 +167,7 @@ window.loadSchools = async function () {
           <div class="data-item-sub">ID: ${d.id} · @${d.data().domain || '도메인 없음'}</div>
         </div>
         <div class="data-item-right">
-          <button class="btn btn-danger btn-sm" onclick="deleteSchool('${d.id}','${d.data().name}')">삭제</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteSchool('${jsq(d.id)}','${jsq(d.data().name)}')">삭제</button>
         </div>
       </div>`).join("");
     refreshSchoolSelect(snap.docs);
@@ -230,7 +232,7 @@ window.loadMiddleAdmins = async function () {
           </div>
           <div class="data-item-right">
             <span class="tag tag-school">${schoolName}</span>
-            <button class="btn btn-danger btn-sm" onclick="deleteMiddleAdmin('${d.id}','${data.email}')">삭제</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteMiddleAdmin('${jsq(d.id)}','${jsq(data.email)}')">삭제</button>
           </div>
         </div>`;
     }).join("");
@@ -296,7 +298,7 @@ window.loadMyStudents = async function () {
           </div>
           <div class="data-item-right">
             <span style="font-size:13px; font-weight:700; color:var(--accent);">${money(data.totalAsset)}</span>
-            <button class="btn btn-danger btn-sm" onclick="deleteStudent('${d.id}','${data.nickname || d.id}')">삭제</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteStudent('${jsq(d.id)}','${jsq(data.nickname || d.id)}')">삭제</button>
           </div>
         </div>`;
     }).join("");

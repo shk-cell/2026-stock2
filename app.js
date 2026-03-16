@@ -142,9 +142,10 @@ async function buyStock() {
   }
 }
 
-async function sellStock(sym) {
+async function sellStock(sym, btn) {
   const qty = await askQty(`[${escHtml(sym)}] 매도 수량`, "var(--pri)");
   if (!qty) return;
+  if (btn) { btn.disabled = true; btn.textContent = "⏳"; }
   try {
     const result = await callTradeAPI({ type: "SELL", symbol: sym, qty });
     if (result.data.success) {
@@ -155,6 +156,8 @@ async function sellStock(sym) {
     }
   } catch {
     alert("매도 실패: 네트워크 오류");
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = "매도"; }
   }
 }
 
@@ -230,7 +233,7 @@ async function refreshData() {
                 <span style="color:${color}; font-weight:700;">${profitRateText}</span>
               </div>
             </div>
-            <button onclick="window.sellStock('${safeId}')" class="btn btn-sell" style="height:34px; font-size:12px; padding:0 12px;" ${currentPrice === 0 ? "disabled" : ""}>매도</button>
+            <button onclick="window.sellStock('${safeId}', this)" class="btn btn-sell" style="height:34px; font-size:12px; padding:0 12px;" ${currentPrice === 0 ? "disabled" : ""}>매도</button>
           </div>`,
         value: val
       };
@@ -299,10 +302,16 @@ async function loadRankingAndHistory(user) {
 // ── globalRefresh: 이전에 조회한 종목이 있으면 시세 재조회, 없으면 포트폴리오만 갱신 ──
 // (수정 전: lastRefresh만 리셋해 stale 가격으로 매수 버튼이 활성화되던 버그 수정)
 const globalRefresh = async () => {
-  if (curSym) {
-    await fetchQuote(curSym); // 현재 심볼 재조회 → lastRefresh 갱신
+  const btn = $("globalRefreshBtn");
+  if (btn) { btn.disabled = true; btn.textContent = "⏳ 업데이트 중..."; }
+  try {
+    if (curSym) {
+      await fetchQuote(curSym); // 현재 심볼 재조회 → lastRefresh 갱신
+    }
+    await refreshData();
+  } finally {
+    if (btn) { btn.disabled = false; btn.textContent = "↻ 현재 시세 업데이트"; }
   }
-  refreshData();
 };
 
 if ($("qBtn"))          $("qBtn").onclick          = () => fetchQuote();
