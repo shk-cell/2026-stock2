@@ -20,10 +20,16 @@ let currentSchoolName = null;
 let currentSchoolDomain = null;
 
 const $ = (id) => document.getElementById(id);
+<<<<<<< HEAD
 const money   = (v) => `$${Number(v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const escHtml = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 // onclick 속성 내 JS 문자열 인자로 안전하게 전달 (JSON.stringify → HTML 이스케이프)
 const escAttr = (s) => escHtml(JSON.stringify(String(s)));
+=======
+const money = (v) => `$${Number(v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+// onclick 속성 내 문자열 인수 이스케이프 (작은따옴표·백슬래시)
+const jsq = (s) => String(s).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+>>>>>>> f05d82c56fd76c4327d75ddf983de62595edb87b
 
 function showAlert(id, msg, type = "info") {
   const el = $(id);
@@ -168,7 +174,11 @@ window.loadSchools = async function () {
           <div class="data-item-sub">ID: ${escHtml(d.id)} · @${escHtml(d.data().domain || '도메인 없음')}</div>
         </div>
         <div class="data-item-right">
+<<<<<<< HEAD
           <button class="btn btn-danger btn-sm" onclick="deleteSchool(${escAttr(d.id)}, ${escAttr(d.data().name)})">삭제</button>
+=======
+          <button class="btn btn-danger btn-sm" onclick="deleteSchool('${jsq(d.id)}','${jsq(d.data().name)}')">삭제</button>
+>>>>>>> f05d82c56fd76c4327d75ddf983de62595edb87b
         </div>
       </div>`).join("");
     refreshSchoolSelect(snap.docs);
@@ -232,8 +242,13 @@ window.loadMiddleAdmins = async function () {
             <div class="data-item-sub">${escHtml(schoolName)}</div>
           </div>
           <div class="data-item-right">
+<<<<<<< HEAD
             <span class="tag tag-school">${escHtml(schoolName)}</span>
             <button class="btn btn-danger btn-sm" onclick="deleteMiddleAdmin(${escAttr(d.id)}, ${escAttr(data.email)})">삭제</button>
+=======
+            <span class="tag tag-school">${schoolName}</span>
+            <button class="btn btn-danger btn-sm" onclick="deleteMiddleAdmin('${jsq(d.id)}','${jsq(data.email)}')">삭제</button>
+>>>>>>> f05d82c56fd76c4327d75ddf983de62595edb87b
           </div>
         </div>`;
     }).join("");
@@ -299,7 +314,11 @@ window.loadMyStudents = async function () {
           </div>
           <div class="data-item-right">
             <span style="font-size:13px; font-weight:700; color:var(--accent);">${money(data.totalAsset)}</span>
+<<<<<<< HEAD
             <button class="btn btn-danger btn-sm" onclick="deleteStudent(${escAttr(d.id)}, ${escAttr(data.nickname || d.id)})">삭제</button>
+=======
+            <button class="btn btn-danger btn-sm" onclick="deleteStudent('${jsq(d.id)}','${jsq(data.nickname || d.id)}')">삭제</button>
+>>>>>>> f05d82c56fd76c4327d75ddf983de62595edb87b
           </div>
         </div>`;
     }).join("");
