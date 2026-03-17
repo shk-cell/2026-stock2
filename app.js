@@ -71,7 +71,7 @@ async function getExchangeRate() {
   try {
     const res  = await fetch(`${QUOTE_URL}?symbol=USDKRW=X`);
     const data = await res.json();
-    const rate = (data.ok && data.price) ? data.price : 1465;
+    const rate = (data.ok && data.price > 0) ? data.price : 1465;
     if ($("currentRateText")) $("currentRateText").textContent = `(현재 환율: ${rate.toLocaleString()}원)`;
     return rate;
   } catch {
