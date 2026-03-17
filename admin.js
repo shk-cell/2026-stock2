@@ -20,7 +20,10 @@ let currentSchoolName = null;
 let currentSchoolDomain = null;
 
 const $ = (id) => document.getElementById(id);
-const money = (v) => `$${Number(v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const money   = (v) => `$${Number(v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+const escHtml = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+// onclick 속성 내 JS 문자열 인자로 안전하게 전달 (JSON.stringify → HTML 이스케이프)
+const escAttr = (s) => escHtml(JSON.stringify(String(s)));
 
 function showAlert(id, msg, type = "info") {
   const el = $(id);
@@ -145,8 +148,8 @@ window.loadOverview = async function () {
     listEl.innerHTML = entries.map(([id, info]) => `
       <div class="data-item">
         <div class="data-item-left">
-          <div class="data-item-name">${info.name}</div>
-          <div class="data-item-sub">ID: ${id}</div>
+          <div class="data-item-name">${escHtml(info.name)}</div>
+          <div class="data-item-sub">ID: ${escHtml(id)}</div>
         </div>
         <div class="data-item-right"><span class="tag tag-school">${info.count}명</span></div>
       </div>`).join("");
@@ -161,11 +164,11 @@ window.loadSchools = async function () {
     listEl.innerHTML = snap.docs.map(d => `
       <div class="data-item">
         <div class="data-item-left">
-          <div class="data-item-name">${d.data().name}</div>
-          <div class="data-item-sub">ID: ${d.id} · @${d.data().domain || '도메인 없음'}</div>
+          <div class="data-item-name">${escHtml(d.data().name)}</div>
+          <div class="data-item-sub">ID: ${escHtml(d.id)} · @${escHtml(d.data().domain || '도메인 없음')}</div>
         </div>
         <div class="data-item-right">
-          <button class="btn btn-danger btn-sm" onclick="deleteSchool('${d.id}','${d.data().name}')">삭제</button>
+          <button class="btn btn-danger btn-sm" onclick="deleteSchool(${escAttr(d.id)}, ${escAttr(d.data().name)})">삭제</button>
         </div>
       </div>`).join("");
     refreshSchoolSelect(snap.docs);
@@ -225,12 +228,12 @@ window.loadMiddleAdmins = async function () {
       return `
         <div class="data-item">
           <div class="data-item-left">
-            <div class="data-item-name">${data.email || d.id}</div>
-            <div class="data-item-sub">${schoolName}</div>
+            <div class="data-item-name">${escHtml(data.email || d.id)}</div>
+            <div class="data-item-sub">${escHtml(schoolName)}</div>
           </div>
           <div class="data-item-right">
-            <span class="tag tag-school">${schoolName}</span>
-            <button class="btn btn-danger btn-sm" onclick="deleteMiddleAdmin('${d.id}','${data.email}')">삭제</button>
+            <span class="tag tag-school">${escHtml(schoolName)}</span>
+            <button class="btn btn-danger btn-sm" onclick="deleteMiddleAdmin(${escAttr(d.id)}, ${escAttr(data.email)})">삭제</button>
           </div>
         </div>`;
     }).join("");
@@ -291,12 +294,12 @@ window.loadMyStudents = async function () {
       return `
         <div class="data-item">
           <div class="data-item-left">
-            <div class="data-item-name">${data.nickname || d.id}</div>
-            <div class="data-item-sub">${d.id}</div>
+            <div class="data-item-name">${escHtml(data.nickname || d.id)}</div>
+            <div class="data-item-sub">${escHtml(d.id)}</div>
           </div>
           <div class="data-item-right">
             <span style="font-size:13px; font-weight:700; color:var(--accent);">${money(data.totalAsset)}</span>
-            <button class="btn btn-danger btn-sm" onclick="deleteStudent('${d.id}','${data.nickname || d.id}')">삭제</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteStudent(${escAttr(d.id)}, ${escAttr(data.nickname || d.id)})">삭제</button>
           </div>
         </div>`;
     }).join("");
@@ -362,7 +365,7 @@ window.loadSchoolRanking = async function () {
       return `
         <div class="rank-item">
           <div class="rank-num ${rankClass}">${medal}</div>
-          <div class="rank-info"><div class="rank-name">${rd.nickname}</div><div class="rank-school">${rd.id}</div></div>
+          <div class="rank-info"><div class="rank-name">${escHtml(rd.nickname)}</div><div class="rank-school">${escHtml(rd.id)}</div></div>
           <div class="rank-asset" style="font-family: 'Noto Sans KR', sans-serif;">${money(rd.totalAsset)}</div>
         </div>`;
     }).join("");
@@ -386,7 +389,7 @@ window.loadAllRanking = async function () {
       return `
         <div class="rank-item">
           <div class="rank-num ${rankClass}">${medal}</div>
-          <div class="rank-info"><div class="rank-name">${rd.nickname}</div><div class="rank-school">${rd.school}</div></div>
+          <div class="rank-info"><div class="rank-name">${escHtml(rd.nickname)}</div><div class="rank-school">${escHtml(rd.school)}</div></div>
           <div class="rank-asset" style="font-family: 'Noto Sans KR', sans-serif;">${money(rd.totalAsset)}</div>
         </div>`;
     }).join("");
