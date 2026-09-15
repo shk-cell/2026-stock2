@@ -1,0 +1,54 @@
+rules_version = '2';
+
+// 학생이 Firestore 콘솔/클라이언트 SDK로 DB를 직접 열람·수정하지 못하도록 막는 보안 규칙.
+// 매수/매도(cash, totalAsset, portfolio, history 생성)는 전부 Cloud Functions(Admin SDK)를 통해서만
+// 이루어지며, Admin SDK는 이 규칙을 우회하므로 서버 로직에는 영향이 없습니다.
+// 배포: firebase login 후 `firebase deploy --only firestore:rules`
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    // 관리자 계정 (config.js의 HEAD_ADMIN_EMAIL과 반드시 동일하게 유지)
+    function isAdmin() {
+      return isSignedIn() && request.auth.token.email == 'shk@bp.icems.kr';
+    }
+
+    function isOwner(email) {
+      return isSignedIn() && request.auth.token.email == email;
+    }
+
+    match /users/{email} {
+      // 학생: 본인 문서만 조회 가능, 목록(list)은 불가 → 다른 학생 자산 열람 차단
+      allow get: if isOwner(email) || isAdmin();
+      allow list: if isAdmin();
+      // 잔고(cash)/총자산(totalAsset) 등은 클라이언트에서 직접 수정 금지 — tradeStock/createUser 함수만 허용
+      allow write: if isAdmin();
+
+      match /portfolio/{symbol} {
+        allow get, list: if isOwner(email) || isAdmin();
+        allow write: if isAdmin();
+      }
+
+      match /history/{txId} {
+        allow get, list: if isOwner(email) || isAdmin();
+        allow write: if isAdmin();
+      }
+    }
+
+    // 더 이상 프론트엔드에서 사용하지 않지만 기존 데이터 보호를 위해 관리자만 접근 허용
+    match /schools/{id} {
+      allow read, write: if isAdmin();
+    }
+    match /admins/{uid} {
+      allow read, write: if isAdmin();
+    }
+
+    // 그 외 모든 문서: 기본 차단
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

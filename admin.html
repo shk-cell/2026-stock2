@@ -167,91 +167,28 @@
 
   <!-- 탭 네비 -->
   <div class="tab-nav" id="tabNav">
-    <div class="tab-btn head-only" data-tab="overview"      onclick="switchTab('overview')">📊 전체 현황</div>
-    <div class="tab-btn head-only" data-tab="schools"       onclick="switchTab('schools')">🏫 학교 관리</div>
-    <div class="tab-btn head-only" data-tab="middleAdmins"  onclick="switchTab('middleAdmins')">👤 미들어드민 관리</div>
-    <div class="tab-btn middle-only" data-tab="myStudents"  onclick="switchTab('myStudents')">🎓 학생 관리</div>
-    <div class="tab-btn middle-only" data-tab="schoolRanking" onclick="switchTab('schoolRanking')">🏆 학교 랭킹</div>
-    <div class="tab-btn head-only" data-tab="allRanking"              onclick="switchTab('allRanking')">🌐 전체 랭킹</div>
+    <div class="tab-btn" data-tab="students" onclick="switchTab('students')">🎓 학생 관리</div>
+    <div class="tab-btn" data-tab="ranking"  onclick="switchTab('ranking')">🌐 전체 랭킹</div>
   </div>
 
-  <!-- HEAD: 전체 현황 -->
-  <div id="tab-overview" class="tab-content head-only fade-in">
+  <!-- 학생 관리 -->
+  <div id="tab-students" class="tab-content fade-in">
     <div class="section-header">
-      <div><div class="section-title">전체 현황</div><div class="section-sub">모든 학교 및 유저 통계</div></div>
-      <button class="btn btn-outline btn-sm" onclick="loadOverview()">↻ 새로고침</button>
-    </div>
-    <div class="stats-grid">
-      <div class="stat-box"><div class="stat-label">총 학교 수</div><div id="statSchools" class="stat-value accent">-</div></div>
-      <div class="stat-box"><div class="stat-label">미들어드민</div><div id="statMiddle" class="stat-value gold">-</div></div>
-      <div class="stat-box"><div class="stat-label">총 학생 수</div><div id="statStudents" class="stat-value green">-</div></div>
-    </div>
-    <div class="card">
-      <div class="card-title">학교별 현황</div>
-      <div id="schoolOverviewList" class="data-list"><div class="empty-state">로딩 중...</div></div>
-    </div>
-  </div>
-
-  <!-- HEAD: 학교 관리 -->
-  <div id="tab-schools" class="tab-content head-only fade-in">
-    <div class="section-header">
-      <div><div class="section-title">학교 관리</div><div class="section-sub">학교 등록 및 목록 관리</div></div>
-    </div>
-    <div class="card">
-      <div class="card-title">새 학교 등록</div>
-      <div id="schoolAddAlert" class="alert"></div>
-      <div class="form-grid cols-3">
-        <div class="form-group"><label>학교 ID</label><input id="newSchoolId" placeholder="bpms (영문, 하이픈)" /></div>
-        <div class="form-group"><label>학교 이름</label><input id="newSchoolName" placeholder="부평중학교" /></div>
-        <div class="form-group"><label>도메인 (비우면 자동)</label><input id="newSchoolDomain" placeholder="bpms.com" /></div>
-      </div>
-      <button class="btn btn-gold btn-sm" style="width:auto; padding:0 20px;" onclick="addSchool()">학교 등록</button>
-    </div>
-    <div class="card">
-      <div class="card-title">등록된 학교 목록</div>
-      <div id="schoolList" class="data-list"><div class="empty-state">등록된 학교가 없습니다.</div></div>
-    </div>
-  </div>
-
-  <!-- HEAD: 미들어드민 관리 -->
-  <div id="tab-middleAdmins" class="tab-content head-only fade-in">
-    <div class="section-header">
-      <div><div class="section-title">미들어드민 관리</div><div class="section-sub">학교별 관리자 계정 생성</div></div>
-    </div>
-    <div class="card">
-      <div class="card-title">미들어드민 계정 생성</div>
-      <div id="middleAddAlert" class="alert"></div>
-      <div class="form-grid cols-3">
-        <div class="form-group"><label>이메일</label><input id="newMiddleEmail" type="email" placeholder="teacher@school.kr" /></div>
-        <div class="form-group"><label>비밀번호</label><input id="newMiddlePw" type="password" placeholder="초기 비밀번호" /></div>
-        <div class="form-group"><label>담당 학교</label><select id="newMiddleSchool"><option value="">학교 선택</option></select></div>
-      </div>
-      <button class="btn btn-gold btn-sm" style="width:auto; padding:0 20px;" onclick="createMiddleAdmin()">미들어드민 생성</button>
-    </div>
-    <div class="card">
-      <div class="card-title">미들어드민 목록</div>
-      <div id="middleAdminList" class="data-list"><div class="empty-state">등록된 미들어드민이 없습니다.</div></div>
-    </div>
-  </div>
-
-  <!-- MIDDLE: 학생 관리 -->
-  <div id="tab-myStudents" class="tab-content middle-only fade-in">
-    <div class="section-header">
-      <div><div class="section-title" id="myStudentTitle">학생 관리</div><div class="section-sub">내 학교 학생 계정 생성 및 관리</div></div>
+      <div><div class="section-title">학생 관리</div><div class="section-sub">학생 계정 생성 및 관리</div></div>
     </div>
     <div class="card">
       <div class="card-title">학생 계정 생성</div>
       <div id="studentAddAlert" class="alert"></div>
       <div class="form-grid cols-3">
-        <div class="form-group"><label>아이디</label><div style="display:flex; align-items:center; gap:6px;"><input id="newStudentPrefix" placeholder="hong" style="flex:1;" /><span id="domainLabel" style="font-size:13px; color:var(--accent); white-space:nowrap; font-weight:700;">@도메인</span></div></div>
+        <div class="form-group"><label>이메일</label><input id="newStudentEmail" type="email" placeholder="student01@school.kr" /></div>
         <div class="form-group"><label>비밀번호</label><input id="newStudentPw" type="password" placeholder="초기 비밀번호" /></div>
         <div class="form-group"><label>닉네임</label><input id="newStudentNick" placeholder="홍길동" /></div>
       </div>
       <div style="background:rgba(255,51,85,0.08); border:1px solid rgba(255,51,85,0.4); border-left:3px solid var(--danger); border-radius:10px; padding:12px 16px; margin-bottom:14px;">
         <div style="color:var(--danger); font-size:13px; font-weight:700; margin-bottom:4px;">⚠️ 개인정보 입력 금지</div>
         <div style="color:#ff6680; font-size:12px; line-height:1.8;">
-          • <b>아이디</b>와 <b>닉네임</b>에 실명, 생년월일, 학번 등 <b>개인정보를 입력하지 마세요.</b><br>
-          • 예) 아이디: <span style="color:var(--txt);">student01</span> / 닉네임: <span style="color:var(--txt);">투자왕</span> (별명 사용 권장)
+          • <b>이메일</b>과 <b>닉네임</b>에 실명, 생년월일, 학번 등 <b>개인정보를 입력하지 마세요.</b><br>
+          • 예) 이메일: <span style="color:var(--txt);">student01@school.kr</span> / 닉네임: <span style="color:var(--txt);">투자왕</span> (별명 사용 권장)
         </div>
       </div>
       <button class="btn btn-primary btn-sm" style="width:auto; padding:0 20px;" onclick="createStudent()">학생 계정 생성</button>
@@ -262,19 +199,10 @@
     </div>
   </div>
 
-  <!-- MIDDLE: 학교 랭킹 -->
-  <div id="tab-schoolRanking" class="tab-content middle-only fade-in">
+  <!-- 전체 랭킹 -->
+  <div id="tab-ranking" class="tab-content fade-in">
     <div class="section-header">
-      <div><div class="section-title" id="schoolRankTitle">학교 랭킹</div><div class="section-sub">우리 학교 학생 투자 순위</div></div>
-      <button class="btn btn-outline btn-sm" onclick="loadSchoolRanking()">↻ 새로고침</button>
-    </div>
-    <div class="card"><div id="schoolRankList"><div class="empty-state">로딩 중...</div></div></div>
-  </div>
-
-  <!-- 공통: 전체 랭킹 -->
-  <div id="tab-allRanking" class="tab-content head-only fade-in">
-    <div class="section-header">
-      <div><div class="section-title">전체 랭킹</div><div class="section-sub">모든 학교 통합 TOP 30</div></div>
+      <div><div class="section-title">전체 랭킹</div><div class="section-sub">전체 학생 TOP 30</div></div>
       <button class="btn btn-outline btn-sm" onclick="loadAllRanking()">↻ 새로고침</button>
     </div>
     <div class="card"><div id="allRankList"><div class="empty-state">로딩 중...</div></div></div>

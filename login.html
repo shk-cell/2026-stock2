@@ -315,12 +315,10 @@
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-  import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
   import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
   import { firebaseConfig, HEAD_ADMIN_EMAIL } from "./config.js";
 
   const app = initializeApp(firebaseConfig);
-  const db  = getFirestore(app);
   const auth = getAuth(app);
 
   const loginBtn  = document.getElementById("loginBtn");
@@ -364,24 +362,13 @@
 
   // ── 역할에 따라 페이지 이동 ──────────────────────────────
   async function redirectByRole(user) {
-    // 1) Head Admin 판별
+    // 관리자 판별 (단일 관리자 계정)
     if (user.email === HEAD_ADMIN_EMAIL) {
       window.location.href = "admin.html";
       return;
     }
 
-    // 2) Middle Admin 판별 (Firestore admins 컬렉션)
-    try {
-      const adminSnap = await getDoc(doc(db, "admins", user.uid));
-      if (adminSnap.exists() && adminSnap.data().role === "middle") {
-        window.location.href = "admin.html";
-        return;
-      }
-    } catch (e) {
-      console.warn("admins 조회 실패:", e);
-    }
-
-    // 3) Student → 기존 투자 화면
+    // 그 외 → 학생 투자 화면
     window.location.href = "index.html";
   }
 
