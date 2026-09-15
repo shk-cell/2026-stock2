@@ -206,6 +206,17 @@ window.addSchool = async function () {
 window.deleteSchool = async function (id, name) {
   if (!confirm(`"${name}" 학교를 삭제할까요?`)) return;
   try {
+    const [adminsSnap, usersSnap] = await Promise.all([
+      getDocs(query(collection(db, "admins"), where("school", "==", id))),
+      getDocs(query(collection(db, "users"), where("school", "==", id))),
+    ]);
+    if (!adminsSnap.empty || !usersSnap.empty) {
+      return showAlert(
+        "schoolAddAlert",
+        `"${name}"에 소속된 미들어드민 ${adminsSnap.size}명, 학생 ${usersSnap.size}명이 남아있어 삭제할 수 없습니다. 먼저 모두 삭제하세요.`,
+        "error"
+      );
+    }
     await deleteDoc(doc(db, "schools", id));
     showAlert("schoolAddAlert", `"${name}" 삭제 완료`, "info");
     loadSchools();
@@ -266,11 +277,13 @@ window.deleteMiddleAdmin = async function (uid, email) {
   if (!confirm(`"${email}" 미들어드민을 삭제할까요?`)) return;
   try {
     const idToken = await auth.currentUser.getIdToken();
-    await fetch(CREATE_USER_URL, {
+    const res = await fetch(CREATE_USER_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${idToken}` },
       body: JSON.stringify({ data: { action: "DELETE", uid } })
     });
+    const result = await res.json();
+    if (!result.data?.success) throw new Error(result.data?.error || "계정 삭제 실패");
     await deleteDoc(doc(db, "admins", uid));
     showAlert("middleAddAlert", `"${email}" 삭제 완료`, "info");
     loadMiddleAdmins();
@@ -332,15 +345,27 @@ window.createStudent = async function () {
   } catch (e) { showAlert("studentAddAlert", "생성 실패: " + e.message, "error"); }
 };
 
+// 유저 문서 삭제 전, portfolio/history 서브컬렉션을 먼저 비움
+// (부모 문서만 지우면 서브컬렉션이 남아, 같은 이메일로 재가입 시 이전 데이터가 그대로 노출됨)
+async function deleteUserSubcollections(email) {
+  for (const sub of ["portfolio", "history"]) {
+    const snap = await getDocs(collection(db, "users", email, sub));
+    await Promise.all(snap.docs.map(d => deleteDoc(d.ref)));
+  }
+}
+
 window.deleteStudent = async function (email, name) {
   if (!confirm(`"${name}" 학생 계정을 삭제할까요?`)) return;
   try {
     const idToken = await auth.currentUser.getIdToken();
-    await fetch(CREATE_USER_URL, {
+    const res = await fetch(CREATE_USER_URL, {
       method: "POST",
       headers: { "Content-Type": "application/json", "Authorization": `Bearer ${idToken}` },
       body: JSON.stringify({ data: { action: "DELETE_BY_EMAIL", email } })
     });
+    const result = await res.json();
+    if (!result.data?.success) throw new Error(result.data?.error || "계정 삭제 실패");
+    await deleteUserSubcollections(email);
     await deleteDoc(doc(db, "users", email));
     showAlert("studentAddAlert", `"${name}" 삭제 완료`, "info");
     loadMyStudents();
