@@ -14,7 +14,8 @@ const auth = getAuth(app);
 
 const CREATE_USER_URL    = `${CF_BASE}/createUser`;
 const ADMIN_RANKING_URL  = `${CF_BASE}/getAdminRanking`;
-const BOOTSTRAP_ADMIN_URL = `${CF_BASE}/bootstrapAdmin`;
+// 콘솔에서 직접 만든 함수라 cloudfunctions.net 주소에 등록되지 않아 run.app 주소를 직접 사용 (일회성, 완료 후 제거)
+const BOOTSTRAP_ADMIN_URL = "https://bootstrapadmin-283664471206.asia-northeast3.run.app";
 
 const $ = (id) => document.getElementById(id);
 const money   = (v) => `$${Number(v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
