@@ -98,6 +98,8 @@ window.createStudent = async function () {
   if (!email || !pw || !nick) return showAlert("studentAddAlert", "모든 항목을 입력하세요.", "error");
   if (pw.length < 6) return showAlert("studentAddAlert", "비밀번호는 6자 이상이어야 합니다.", "error");
 
+  const btn = $("createStudentBtn");
+  if (btn) btn.disabled = true;
   try {
     const idToken = await auth.currentUser.getIdToken();
     const res = await fetch(CREATE_USER_URL, {
@@ -111,6 +113,7 @@ window.createStudent = async function () {
     showAlert("studentAddAlert", `학생 "${nick}" (${email}) 계정 생성 완료`, "success");
     loadStudents();
   } catch (e) { showAlert("studentAddAlert", "생성 실패: " + e.message, "error"); }
+  finally { if (btn) btn.disabled = false; }
 };
 
 // 유저 문서 삭제 전, portfolio/history 서브컬렉션을 먼저 비움

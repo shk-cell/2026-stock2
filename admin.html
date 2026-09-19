@@ -54,7 +54,6 @@
     .topbar-logo { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 800; letter-spacing: 3px; color: var(--accent); }
     .role-badge { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 10px; border-radius: 20px; }
     .badge-head { background: rgba(245,200,66,0.15); color: var(--gold); border: 1px solid rgba(245,200,66,0.3); }
-    .badge-middle { background: rgba(0,212,255,0.1); color: var(--accent); border: 1px solid rgba(0,212,255,0.25); }
     .topbar-right { display: flex; align-items: center; gap: 12px; }
     #topbarUser { font-size: 12px; color: var(--muted); }
 
@@ -123,12 +122,7 @@
     .rank-num.r3 { color: #cd7f32; }
     .rank-info { flex: 1; }
     .rank-name { font-size: 13px; font-weight: 500; }
-    .rank-school { font-size: 11px; color: var(--muted); }
     .rank-asset { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--accent); }
-
-    /* 태그 */
-    .tag { font-size: 10px; font-weight: 700; letter-spacing: 1px; padding: 2px 8px; border-radius: 4px; }
-    .tag-school { background: rgba(0,212,255,0.1); color: var(--accent); border: 1px solid rgba(0,212,255,0.2); }
 
     /* 알림 */
     .alert { padding: 12px 16px; border-radius: 10px; font-size: 13px; margin-bottom: 14px; display: none; }
@@ -191,7 +185,7 @@
           • 예) 이메일: <span style="color:var(--txt);">student01@school.kr</span> / 닉네임: <span style="color:var(--txt);">투자왕</span> (별명 사용 권장)
         </div>
       </div>
-      <button class="btn btn-primary btn-sm" style="width:auto; padding:0 20px;" onclick="createStudent()">학생 계정 생성</button>
+      <button id="createStudentBtn" class="btn btn-primary btn-sm" style="width:auto; padding:0 20px;" onclick="createStudent()">학생 계정 생성</button>
     </div>
     <div class="card">
       <div class="card-title">학생 목록</div>

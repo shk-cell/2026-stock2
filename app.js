@@ -14,6 +14,13 @@ const RANKING_URL = `${CF_BASE}/getRanking`;
 const $ = (id) => document.getElementById(id);
 const money  = (v) => `$${Number(v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 const escHtml = (s) => String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+// onclick 속성 내 JS 문자열 인자로 안전하게 전달 (JSON.stringify → HTML 이스케이프)
+const escAttr = (s) => escHtml(JSON.stringify(String(s)));
+
+async function authFetch(url) {
+  const idToken = await auth.currentUser.getIdToken();
+  return fetch(url, { headers: { "Authorization": `Bearer ${idToken}` } });
+}
 
 let curPrice = 0, curSym = "", lastRefresh = 0;
 
@@ -69,7 +76,7 @@ function askQty(title, confirmColor = "var(--up)") {
 
 async function getExchangeRate() {
   try {
-    const res  = await fetch(`${QUOTE_URL}?symbol=USDKRW=X`);
+    const res  = await authFetch(`${QUOTE_URL}?symbol=USDKRW=X`);
     const data = await res.json();
     const rate = (data.ok && data.price > 0) ? data.price : 1465;
     if ($("currentRateText")) $("currentRateText").textContent = `(현재 환율: ${rate.toLocaleString()}원)`;
@@ -85,7 +92,7 @@ async function fetchQuote(symbolOverride = null) {
   if (!sym) return;
   setLoading("qBtn", true, "조회");
   try {
-    const res  = await fetch(`${QUOTE_URL}?symbol=${encodeURIComponent(sym)}`);
+    const res  = await authFetch(`${QUOTE_URL}?symbol=${encodeURIComponent(sym)}`);
     const data = await res.json();
     if (data.ok) {
       const rate = await getExchangeRate();
@@ -143,7 +150,7 @@ async function buyStock() {
 }
 
 async function sellStock(sym, btn) {
-  const qty = await askQty(`[${escHtml(sym)}] 매도 수량`, "var(--pri)");
+  const qty = await askQty(`[${sym}] 매도 수량`, "var(--pri)");
   if (!qty) return;
   if (btn) { btn.disabled = true; btn.textContent = "⏳"; }
   try {
@@ -192,7 +199,7 @@ async function refreshData() {
 
       let currentPrice = 0;
       try {
-        const res   = await fetch(`${QUOTE_URL}?symbol=${encodeURIComponent(s.id)}`);
+        const res   = await authFetch(`${QUOTE_URL}?symbol=${encodeURIComponent(s.id)}`);
         const quote = await res.json();
         if (quote && quote.ok) {
           currentPrice = Number(quote.price);
@@ -233,7 +240,7 @@ async function refreshData() {
                 <span style="color:${color}; font-weight:700;">${profitRateText}</span>
               </div>
             </div>
-            <button onclick="window.sellStock('${safeId}', this)" class="btn btn-sell" style="height:34px; font-size:12px; padding:0 12px;" ${currentPrice === 0 ? "disabled" : ""}>매도</button>
+            <button onclick="window.sellStock(${escAttr(s.id)}, this)" class="btn btn-sell" style="height:34px; font-size:12px; padding:0 12px;" ${currentPrice === 0 ? "disabled" : ""}>매도</button>
           </div>`,
         value: val
       };
