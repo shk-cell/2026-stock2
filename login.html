@@ -362,11 +362,18 @@
 
   // ── 역할에 따라 페이지 이동 ──────────────────────────────
   async function redirectByRole(user) {
-    // 관리자 판별 (단일 관리자 계정)
+    // 관리자 판별: 이메일 비교(과도기) 또는 admin 커스텀 클레임
     if (user.email === HEAD_ADMIN_EMAIL) {
       window.location.href = "admin.html";
       return;
     }
+    try {
+      const tokenResult = await user.getIdTokenResult();
+      if (tokenResult.claims.admin === true) {
+        window.location.href = "admin.html";
+        return;
+      }
+    } catch (e) {}
 
     // 그 외 → 학생 투자 화면
     window.location.href = "index.html";

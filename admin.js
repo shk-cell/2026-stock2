@@ -12,8 +12,9 @@ const app  = initializeApp(firebaseConfig);
 const db   = getFirestore(app);
 const auth = getAuth(app);
 
-const CREATE_USER_URL   = `${CF_BASE}/createUser`;
-const ADMIN_RANKING_URL = `${CF_BASE}/getAdminRanking`;
+const CREATE_USER_URL    = `${CF_BASE}/createUser`;
+const ADMIN_RANKING_URL  = `${CF_BASE}/getAdminRanking`;
+const BOOTSTRAP_ADMIN_URL = `${CF_BASE}/bootstrapAdmin`;
 
 const $ = (id) => document.getElementById(id);
 const money   = (v) => `$${Number(v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -52,7 +53,10 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  if (user.email !== HEAD_ADMIN_EMAIL) {
+  // 이메일 비교(과도기) 또는 admin 커스텀 클레임으로 관리자 판별
+  const tokenResult = await user.getIdTokenResult();
+  const isAdmin = user.email === HEAD_ADMIN_EMAIL || tokenResult.claims.admin === true;
+  if (!isAdmin) {
     alert("관리자 권한이 없습니다.");
     await signOut(auth);
     window.location.href = "login.html";
@@ -64,6 +68,23 @@ onAuthStateChanged(auth, async (user) => {
   $("roleBadge").className = "role-badge badge-head";
   switchTab("students");
 });
+
+// ── 관리자 권한 클레임 부여 (최초 1회만 실행, 완료 후 제거 예정) ──
+window.bootstrapAdmin = async function () {
+  if (!confirm("현재 로그인 계정에 admin 권한 클레임을 부여할까요? (최초 1회만 실행)")) return;
+  try {
+    const idToken = await auth.currentUser.getIdToken();
+    const res = await fetch(BOOTSTRAP_ADMIN_URL, {
+      method: "POST",
+      headers: { "Authorization": `Bearer ${idToken}` }
+    });
+    const result = await res.json();
+    if (!result.data?.success) throw new Error(result.data?.error || "실패");
+    alert("권한 클레임 부여 완료! 로그아웃 후 다시 로그인해주세요.");
+  } catch (e) {
+    alert("실패: " + e.message);
+  }
+};
 
 // ══════════════════════════════════════════════════════════════
 //  학생 관리
