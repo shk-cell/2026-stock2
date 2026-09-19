@@ -8,19 +8,19 @@
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #070a0f;
-      --surface: #0d1117;
-      --card: #111820;
-      --card2: #151e2a;
-      --border: #1e2d3d;
-      --border2: #243444;
-      --txt: #e2eaf4;
-      --muted: #6b8099;
-      --muted2: #4a6070;
-      --accent: #00d4ff;
-      --gold: #f5c842;
-      --green: #00cc88;
-      --danger: #ff3355;
+      --bg: #f3f6fb;
+      --surface: #ffffff;
+      --card: #ffffff;
+      --card2: #f6f8fc;
+      --border: #dfe6f0;
+      --border2: #cdd7e6;
+      --txt: #1b2536;
+      --muted: #66768c;
+      --muted2: #8593a6;
+      --accent: #0a7fb0;
+      --gold: #b7860b;
+      --green: #0f9d6b;
+      --danger: #e5334a;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -34,8 +34,8 @@
       position: fixed;
       inset: 0;
       background-image:
-        linear-gradient(rgba(0,212,255,0.03) 1px, transparent 1px),
-        linear-gradient(90deg, rgba(0,212,255,0.03) 1px, transparent 1px);
+        linear-gradient(rgba(37,99,235,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(37,99,235,0.04) 1px, transparent 1px);
       background-size: 40px 40px;
       pointer-events: none;
       z-index: 0;
@@ -44,7 +44,7 @@
     /* 상단 바 */
     .topbar {
       position: sticky; top: 0; z-index: 50;
-      background: rgba(7,10,15,0.92);
+      background: rgba(255,255,255,0.92);
       backdrop-filter: blur(12px);
       border-bottom: 1px solid var(--border);
       padding: 0 24px; height: 60px;
@@ -53,7 +53,7 @@
     .topbar-left { display: flex; align-items: center; gap: 16px; }
     .topbar-logo { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 800; letter-spacing: 3px; color: var(--accent); }
     .role-badge { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; padding: 3px 10px; border-radius: 20px; }
-    .badge-head { background: rgba(245,200,66,0.15); color: var(--gold); border: 1px solid rgba(245,200,66,0.3); }
+    .badge-head { background: rgba(245,200,66,0.2); color: var(--gold); border: 1px solid rgba(183,134,11,0.4); }
     .topbar-right { display: flex; align-items: center; gap: 12px; }
     #topbarUser { font-size: 12px; color: var(--muted); }
 
@@ -62,8 +62,8 @@
     .btn:hover { filter: brightness(1.15); transform: translateY(-1px); }
     .btn:active { transform: translateY(0); }
     .btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; filter: none; }
-    .btn-primary { background: var(--accent); color: #000; }
-    .btn-gold { background: var(--gold); color: #000; }
+    .btn-primary { background: var(--accent); color: #fff; }
+    .btn-gold { background: var(--gold); color: #fff; }
     .btn-outline { background: transparent; border: 1px solid var(--border2); color: var(--txt); }
     .btn-outline:hover { border-color: var(--accent); color: var(--accent); }
     .btn-danger { background: var(--danger); color: white; }
@@ -118,8 +118,8 @@
     .rank-item:hover { background: var(--card2); }
     .rank-num { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 800; width: 28px; text-align: center; color: var(--muted2); }
     .rank-num.r1 { color: var(--gold); }
-    .rank-num.r2 { color: #c0c0c0; }
-    .rank-num.r3 { color: #cd7f32; }
+    .rank-num.r2 { color: #8a94a3; }
+    .rank-num.r3 { color: #b0651f; }
     .rank-info { flex: 1; }
     .rank-name { font-size: 13px; font-weight: 500; }
     .rank-asset { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 700; color: var(--accent); }
@@ -127,12 +127,12 @@
     /* 알림 */
     .alert { padding: 12px 16px; border-radius: 10px; font-size: 13px; margin-bottom: 14px; display: none; }
     .alert.show { display: block; }
-    .alert-success { background: rgba(0,204,136,0.1); border: 1px solid rgba(0,204,136,0.3); color: var(--green); }
-    .alert-error { background: rgba(255,51,85,0.1); border: 1px solid rgba(255,51,85,0.3); color: var(--danger); }
-    .alert-info { background: rgba(0,212,255,0.08); border: 1px solid rgba(0,212,255,0.2); color: var(--accent); }
+    .alert-success { background: rgba(15,157,107,0.1); border: 1px solid rgba(15,157,107,0.35); color: var(--green); }
+    .alert-error { background: rgba(229,51,74,0.08); border: 1px solid rgba(229,51,74,0.3); color: var(--danger); }
+    .alert-info { background: rgba(10,127,176,0.08); border: 1px solid rgba(10,127,176,0.25); color: var(--accent); }
 
     .empty-state { text-align: center; padding: 40px 20px; color: var(--muted); font-size: 13px; }
-    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(0,212,255,0.2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; }
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(10,127,176,0.2); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.6s linear infinite; }
     @keyframes spin { to { transform: rotate(360deg); } }
     .hidden { display: none !important; }
     .fade-in { animation: fadeIn 0.3s ease; }
@@ -178,9 +178,9 @@
         <div class="form-group"><label>비밀번호</label><input id="newStudentPw" type="password" placeholder="초기 비밀번호" /></div>
         <div class="form-group"><label>닉네임</label><input id="newStudentNick" placeholder="홍길동" /></div>
       </div>
-      <div style="background:rgba(255,51,85,0.08); border:1px solid rgba(255,51,85,0.4); border-left:3px solid var(--danger); border-radius:10px; padding:12px 16px; margin-bottom:14px;">
+      <div style="background:rgba(229,51,74,0.06); border:1px solid rgba(229,51,74,0.35); border-left:3px solid var(--danger); border-radius:10px; padding:12px 16px; margin-bottom:14px;">
         <div style="color:var(--danger); font-size:13px; font-weight:700; margin-bottom:4px;">⚠️ 개인정보 입력 금지</div>
-        <div style="color:#ff6680; font-size:12px; line-height:1.8;">
+        <div style="color:#c0283d; font-size:12px; line-height:1.8;">
           • <b>이메일</b>과 <b>닉네임</b>에 실명, 생년월일, 학번 등 <b>개인정보를 입력하지 마세요.</b><br>
           • 예) 이메일: <span style="color:var(--txt);">student01@school.kr</span> / 닉네임: <span style="color:var(--txt);">투자왕</span> (별명 사용 권장)
         </div>

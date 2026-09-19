@@ -272,7 +272,7 @@ async function loadRankingAndHistory(user) {
       rankData.ranking.forEach((rd, i) => {
         const rankClass = i === 0 ? "r1" : i === 1 ? "r2" : i === 2 ? "r3" : "";
         const medal     = i === 0 ? "🥇" : i === 1 ? "🥈" : i === 2 ? "🥉" : `${i + 1}`;
-        const meStyle   = rd.isMe ? "background:rgba(43,124,255,0.08); border-radius:8px; padding:0 6px;" : "";
+        const meStyle   = rd.isMe ? "background:rgba(37,99,235,0.08); border-radius:8px; padding:0 6px;" : "";
         rHtml += `<div class="rank-row" style="${meStyle}">
           <div class="rank-num ${rankClass}">${medal}</div>
           <div style="flex:1; font-size:13px;">${escHtml(rd.nickname)}${rd.isMe ? ' <span style="color:var(--pri); font-size:11px;">나</span>' : ""}</div>
