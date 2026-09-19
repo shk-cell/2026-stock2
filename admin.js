@@ -6,16 +6,14 @@ import {
 import {
   getAuth, signOut, onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-import { firebaseConfig, HEAD_ADMIN_EMAIL, CF_BASE } from "./config.js";
+import { firebaseConfig, CF_BASE } from "./config.js";
 
 const app  = initializeApp(firebaseConfig);
 const db   = getFirestore(app);
 const auth = getAuth(app);
 
-const CREATE_USER_URL    = `${CF_BASE}/createUser`;
-const ADMIN_RANKING_URL  = `${CF_BASE}/getAdminRanking`;
-// 콘솔에서 직접 만든 함수라 cloudfunctions.net 주소에 등록되지 않아 run.app 주소를 직접 사용 (일회성, 완료 후 제거)
-const BOOTSTRAP_ADMIN_URL = "https://bootstrapadmin-283664471206.asia-northeast3.run.app";
+const CREATE_USER_URL   = `${CF_BASE}/createUser`;
+const ADMIN_RANKING_URL = `${CF_BASE}/getAdminRanking`;
 
 const $ = (id) => document.getElementById(id);
 const money   = (v) => `$${Number(v || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
@@ -54,10 +52,9 @@ onAuthStateChanged(auth, async (user) => {
     return;
   }
 
-  // 이메일 비교(과도기) 또는 admin 커스텀 클레임으로 관리자 판별
+  // admin 커스텀 클레임으로 관리자 판별
   const tokenResult = await user.getIdTokenResult();
-  const isAdmin = user.email === HEAD_ADMIN_EMAIL || tokenResult.claims.admin === true;
-  if (!isAdmin) {
+  if (tokenResult.claims.admin !== true) {
     alert("관리자 권한이 없습니다.");
     await signOut(auth);
     window.location.href = "login.html";
@@ -69,23 +66,6 @@ onAuthStateChanged(auth, async (user) => {
   $("roleBadge").className = "role-badge badge-head";
   switchTab("students");
 });
-
-// ── 관리자 권한 클레임 부여 (최초 1회만 실행, 완료 후 제거 예정) ──
-window.bootstrapAdmin = async function () {
-  if (!confirm("현재 로그인 계정에 admin 권한 클레임을 부여할까요? (최초 1회만 실행)")) return;
-  try {
-    const idToken = await auth.currentUser.getIdToken();
-    const res = await fetch(BOOTSTRAP_ADMIN_URL, {
-      method: "POST",
-      headers: { "Authorization": `Bearer ${idToken}` }
-    });
-    const result = await res.json();
-    if (!result.data?.success) throw new Error(result.data?.error || "실패");
-    alert("권한 클레임 부여 완료! 로그아웃 후 다시 로그인해주세요.");
-  } catch (e) {
-    alert("실패: " + e.message);
-  }
-};
 
 // ══════════════════════════════════════════════════════════════
 //  학생 관리

@@ -11,10 +11,9 @@ service cloud.firestore {
       return request.auth != null;
     }
 
-    // 관리자 판별: 이메일 비교(과도기, config.js의 HEAD_ADMIN_EMAIL과 동일하게 유지)
-    // 또는 bootstrapAdmin으로 심어준 admin 커스텀 클레임
+    // 관리자 판별: Firebase Auth 커스텀 클레임 (admin: true)
     function isAdmin() {
-      return isSignedIn() && (request.auth.token.email == 'shk@bp.icems.kr' || request.auth.token.admin == true);
+      return isSignedIn() && request.auth.token.admin == true;
     }
 
     function isOwner(email) {

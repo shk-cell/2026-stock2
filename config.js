@@ -1,7 +1,5 @@
 // 공유 설정 — 이 파일 하나만 수정하면 전체에 반영됩니다.
 
-export const HEAD_ADMIN_EMAIL = "shk@bp.icems.kr";
-
 export const firebaseConfig = {
   apiKey: "AIzaSyD0Cl5VyhKivRExMLECf5uR7FhaCOov-s0",
   authDomain: "stock2-c7470.firebaseapp.com",

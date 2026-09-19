@@ -316,7 +316,7 @@
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
   import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-  import { firebaseConfig, HEAD_ADMIN_EMAIL } from "./config.js";
+  import { firebaseConfig } from "./config.js";
 
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
@@ -362,11 +362,7 @@
 
   // ── 역할에 따라 페이지 이동 ──────────────────────────────
   async function redirectByRole(user) {
-    // 관리자 판별: 이메일 비교(과도기) 또는 admin 커스텀 클레임
-    if (user.email === HEAD_ADMIN_EMAIL) {
-      window.location.href = "admin.html";
-      return;
-    }
+    // 관리자 판별: admin 커스텀 클레임
     try {
       const tokenResult = await user.getIdTokenResult();
       if (tokenResult.claims.admin === true) {
