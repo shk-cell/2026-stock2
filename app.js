@@ -108,7 +108,7 @@ async function fetchQuote(symbolOverride = null) {
       updateTimer();
     } else {
       // symbolOverride일 때는 자동 재조회이므로 alert 생략
-      if (!symbolOverride) alert("종목을 찾을 수 없습니다.");
+      if (!symbolOverride) alert(data.error || "종목을 찾을 수 없습니다.");
     }
   } catch {
     if (!symbolOverride) alert("시세 호출 실패. 잠시 후 다시 시도해주세요.");
