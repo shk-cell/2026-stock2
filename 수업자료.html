@@ -1,0 +1,2155 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>주식투자 첫걸음</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #e9eef6;
+    --paper: #ffffff;
+    --ink: #1b2536;
+    --muted: #66768c;
+    --line: #dfe6f0;
+    --soft: #f3f6fb;
+    --pri: #2563eb;
+    --pri-soft: #e8efff;
+    --accent: #0a7fb0;
+    --up: #e5334a;
+    --up-soft: #fdecee;
+    --down: #1d6fe0;
+    --down-soft: #e8f1fd;
+    --green: #0f9d6b;
+    --green-soft: #e6f6f0;
+    --warn: #b45309;
+    --warn-soft: #fdf3e6;
+    --navy: #0f1d3a;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Noto Sans KR', sans-serif;
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── 무대(16:9 고정, 화면에 맞게 확대/축소) ── */
+  #viewport { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; }
+  #stage { width: 1280px; height: 720px; position: relative; transform-origin: center center; flex-shrink: 0; }
+  .slide {
+    position: absolute; inset: 0;
+    background: var(--paper);
+    border-radius: 14px;
+    box-shadow: 0 20px 60px rgba(15, 29, 58, 0.18);
+    padding: 64px 80px 70px;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  .slide.active { display: flex; animation: enter 0.35s ease; }
+  @keyframes enter { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+  .slide::after {
+    content: attr(data-part);
+    position: absolute; left: 80px; bottom: 26px;
+    font-size: 13px; color: var(--muted); letter-spacing: 1px;
+  }
+  .slide .pno { position: absolute; right: 80px; bottom: 24px; font-size: 13px; color: var(--muted); font-weight: 700; }
+
+  /* ── 타이포 ── */
+  .kicker { font-size: 15px; font-weight: 700; color: var(--pri); letter-spacing: 2px; margin-bottom: 10px; }
+  h1 { font-size: 64px; font-weight: 900; line-height: 1.2; letter-spacing: -1px; }
+  h2 { font-size: 40px; font-weight: 900; line-height: 1.3; letter-spacing: -0.5px; margin-bottom: 28px; }
+  h3 { font-size: 22px; font-weight: 700; margin-bottom: 10px; }
+  p, li { font-size: 21px; line-height: 1.7; }
+  .lead { font-size: 25px; line-height: 1.7; color: #33415a; }
+  .muted { color: var(--muted); }
+  .small { font-size: 16px; line-height: 1.6; }
+  b.up, .up { color: var(--up); }
+  b.down, .down { color: var(--down); }
+  .hl { background: linear-gradient(transparent 60%, #ffe58a 60%); padding: 0 2px; }
+  ul.dots { list-style: none; }
+  ul.dots li { padding-left: 28px; position: relative; margin-bottom: 10px; }
+  ul.dots li::before { content: ""; position: absolute; left: 4px; top: 14px; width: 9px; height: 9px; border-radius: 50%; background: var(--pri); }
+  ol.steps { list-style: none; counter-reset: s; }
+  ol.steps li { counter-increment: s; padding-left: 52px; position: relative; margin-bottom: 16px; }
+  ol.steps li::before { content: counter(s); position: absolute; left: 0; top: 2px; width: 36px; height: 36px; border-radius: 50%; background: var(--pri); color: #fff; font-weight: 700; font-size: 18px; display: flex; align-items: center; justify-content: center; }
+
+  /* ── 레이아웃 ── */
+  .body { flex: 1; display: flex; flex-direction: column; justify-content: center; min-height: 0; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; }
+  .grid4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+  .row { display: flex; gap: 28px; align-items: center; }
+  .card { background: var(--soft); border: 1px solid var(--line); border-radius: 16px; padding: 24px 26px; }
+  .card p, .card li { font-size: 18px; line-height: 1.65; }
+  .card.blue { background: var(--pri-soft); border-color: #c9d8fb; }
+  .card.red { background: var(--up-soft); border-color: #f6c6cd; }
+  .card.down { background: var(--down-soft); border-color: #c3dafa; }
+  .card.green { background: var(--green-soft); border-color: #bfe6d6; }
+  .card.warn { background: var(--warn-soft); border-color: #f1d7b2; }
+  .emoji { font-size: 44px; line-height: 1; margin-bottom: 12px; }
+  .big { font-size: 72px; font-weight: 900; line-height: 1.1; letter-spacing: -2px; }
+  .formula {
+    background: var(--navy); color: #fff; border-radius: 16px; padding: 26px 34px;
+    font-size: 30px; font-weight: 700; text-align: center; letter-spacing: -0.5px;
+  }
+  .formula small { display: block; font-size: 17px; font-weight: 400; color: #a9b6d3; margin-top: 8px; }
+  .note { border-left: 5px solid var(--pri); background: var(--pri-soft); padding: 16px 22px; border-radius: 0 12px 12px 0; font-size: 19px; line-height: 1.6; }
+  .note.warn { border-color: var(--warn); background: var(--warn-soft); }
+  .note.red { border-color: var(--up); background: var(--up-soft); }
+  table.t { width: 100%; border-collapse: collapse; font-size: 19px; }
+  table.t th { background: var(--navy); color: #fff; font-weight: 700; padding: 12px 14px; text-align: left; }
+  table.t th:first-child { border-radius: 10px 0 0 0; }
+  table.t th:last-child { border-radius: 0 10px 0 0; }
+  table.t td { padding: 12px 14px; border-bottom: 1px solid var(--line); }
+  table.t tr:nth-child(even) td { background: var(--soft); }
+  .pill { display: inline-block; padding: 4px 14px; border-radius: 99px; font-size: 15px; font-weight: 700; background: var(--pri-soft); color: var(--pri); }
+  .pill.red { background: var(--up-soft); color: var(--up); }
+  .pill.down { background: var(--down-soft); color: var(--down); }
+  .pill.green { background: var(--green-soft); color: var(--green); }
+  .center { text-align: center; }
+  .mt { margin-top: 24px; }
+  .mt-s { margin-top: 12px; }
+  svg text { font-family: 'Noto Sans KR', sans-serif; }
+
+  /* ── 표지 / 파트 구분 ── */
+  .slide.cover { background: linear-gradient(135deg, #0f1d3a 0%, #1d3f8f 60%, #2563eb 100%); color: #fff; justify-content: center; }
+  .slide.cover .kicker { color: #9ec1ff; }
+  .slide.cover .lead { color: #d6e2ff; }
+  .slide.cover::after, .slide.part::after { color: rgba(255,255,255,0.6); }
+  .slide.cover .pno, .slide.part .pno { color: rgba(255,255,255,0.6); }
+  .slide.part { background: var(--navy); color: #fff; justify-content: center; }
+  .slide.part .num { font-size: 120px; font-weight: 900; color: var(--pri); line-height: 1; opacity: 0.9; }
+  .slide.part h1 { margin-top: 10px; }
+  .slide.part .lead { color: #b8c5e2; margin-top: 18px; }
+  .ticker { position: absolute; right: -40px; top: 60px; font-size: 220px; font-weight: 900; opacity: 0.06; letter-spacing: -8px; }
+
+  /* ── 퀴즈 ── */
+  .quiz-item { display: flex; align-items: center; gap: 18px; padding: 14px 20px; border: 1px solid var(--line); border-radius: 12px; margin-bottom: 12px; background: var(--soft); }
+  .quiz-item .q { flex: 1; font-size: 20px; }
+  .quiz-item button { border: none; background: var(--pri); color: #fff; border-radius: 10px; padding: 8px 16px; font-size: 15px; font-weight: 700; cursor: pointer; font-family: inherit; }
+  .quiz-item .a { display: none; font-size: 17px; color: var(--muted); }
+  .quiz-item.show .a { display: block; }
+  .quiz-item.show button { display: none; }
+  .ox { font-weight: 900; font-size: 22px; margin-right: 8px; }
+
+  /* ── 슬라이더 위젯 ── */
+  .ctl { display: flex; align-items: center; gap: 16px; font-size: 19px; margin-bottom: 8px; }
+  .ctl input[type=range] { flex: 1; accent-color: var(--pri); }
+  .ctl output { font-weight: 900; color: var(--pri); min-width: 70px; }
+
+  /* ── 하단 컨트롤 ── */
+  #progress { position: fixed; left: 0; top: 0; height: 4px; background: var(--pri); transition: width 0.3s; z-index: 10; }
+  #controls { position: fixed; right: 16px; bottom: 14px; display: flex; gap: 8px; z-index: 10; opacity: 0.35; transition: opacity 0.2s; }
+  #controls:hover { opacity: 1; }
+  #controls button { width: 40px; height: 40px; border-radius: 10px; border: 1px solid var(--line); background: #fff; color: var(--ink); font-size: 17px; cursor: pointer; font-family: inherit; }
+  #menu { position: fixed; inset: 0; background: rgba(15,29,58,0.6); backdrop-filter: blur(4px); display: none; z-index: 20; align-items: center; justify-content: center; }
+  #menu.open { display: flex; }
+  #menu .panel { background: #fff; border-radius: 16px; width: min(920px, 92vw); max-height: 84vh; overflow: auto; padding: 24px; }
+  #menu .panel h3 { margin-bottom: 14px; }
+  #menu .list { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 6px; }
+  #menu a { display: block; padding: 8px 12px; border-radius: 8px; color: var(--ink); text-decoration: none; font-size: 14px; }
+  #menu a:hover, #menu a.cur { background: var(--pri-soft); color: var(--pri); }
+  #menu a span { color: var(--muted); display: inline-block; width: 32px; }
+  #hint { position: fixed; left: 16px; bottom: 16px; font-size: 12px; color: var(--muted); z-index: 10; }
+
+  @media print {
+    body { overflow: visible; background: #fff; }
+    #viewport { position: static; display: block; }
+    #stage { transform: none !important; width: auto; height: auto; }
+    .slide { display: flex !important; position: relative; width: 1280px; height: 720px; page-break-after: always; box-shadow: none; border-radius: 0; animation: none; }
+    #progress, #controls, #menu, #hint { display: none !important; }
+    @page { size: 1280px 720px; margin: 0; }
+  }
+</style>
+</head>
+<body>
+<div id="progress"></div>
+<div id="viewport"><div id="stage">
+
+<!-- ═════════════ 표지 ═════════════ -->
+<section class="slide cover" data-title="표지">
+  <div class="ticker">STOCK</div>
+  <div class="kicker">금융 교육 · 모의투자 수업</div>
+  <h1>주식투자 첫걸음</h1>
+  <p class="lead mt">돈의 원리부터 기업 분석, 위험 관리, 투자 심리까지<br>가상 자금 <b>$70,000</b>으로 직접 해 보는 모의투자</p>
+</section>
+
+<section class="slide" data-title="수업을 시작하며">
+  <div class="kicker">INTRO</div>
+  <h2>이 수업에서 우리가 하는 것</h2>
+  <div class="body">
+    <div class="grid3">
+      <div class="card blue"><div class="emoji">📚</div><h3>배우기</h3><p>주식이 무엇이고 주가가 왜 움직이는지 원리를 이해해요.</p></div>
+      <div class="card green"><div class="emoji">🔍</div><h3>분석하기</h3><p>뉴스·재무제표·차트를 근거로 기업을 스스로 판단해요.</p></div>
+      <div class="card red"><div class="emoji">📈</div><h3>경험하기</h3><p>가상 자금으로 실제 시세에 투자하고 결과를 돌아봐요.</p></div>
+    </div>
+    <div class="note mt">이 수업의 목표는 <b>돈을 많이 버는 법</b>이 아니라 <b>근거를 가지고 판단하는 힘</b>을 기르는 거예요.</div>
+  </div>
+</section>
+
+<section class="slide" data-title="목차">
+  <div class="kicker">CONTENTS</div>
+  <h2>오늘의 목차</h2>
+  <div class="body">
+    <div class="grid2" style="gap:6px 40px;">
+      <p><b class="up">01</b>&nbsp; 왜 투자를 배워야 할까</p>
+      <p><b class="up">06</b>&nbsp; 차트 읽기 기초</p>
+      <p><b class="up">02</b>&nbsp; 주식과 주식시장</p>
+      <p><b class="up">07</b>&nbsp; 투자 전략과 위험 관리</p>
+      <p><b class="up">03</b>&nbsp; 주식의 역사</p>
+      <p><b class="up">08</b>&nbsp; 투자 심리와 흔한 실수</p>
+      <p><b class="up">04</b>&nbsp; 주가를 움직이는 힘</p>
+      <p><b class="up">09</b>&nbsp; 투자 윤리와 주의사항</p>
+      <p><b class="up">05</b>&nbsp; 좋은 기업 찾기 (기업 분석)</p>
+      <p><b class="up">10</b>&nbsp; 모의투자 실전 활동</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-title="생각 열기">
+  <div class="kicker">WARM-UP</div>
+  <h2>먼저 생각해 볼까요?</h2>
+  <div class="body">
+    <div class="card blue" style="padding:40px;">
+      <p class="lead center">지금 <b>100만 원</b>이 생겼어요.<br>10년 뒤에도 이 돈의 가치를 지키려면 어떻게 해야 할까요?</p>
+    </div>
+    <div class="grid4 mt center">
+      <div class="card"><div class="emoji">🐷</div><p>저금통에 보관</p></div>
+      <div class="card"><div class="emoji">🏦</div><p>은행 예금</p></div>
+      <div class="card"><div class="emoji">📈</div><p>주식 투자</p></div>
+      <div class="card"><div class="emoji">🛍️</div><p>지금 다 쓰기</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════ PART 1 ═════════════ -->
+<section class="slide part" data-title="PART 1 왜 투자를 배워야 할까">
+  <div class="num">01</div>
+  <h1>왜 투자를 배워야 할까</h1>
+  <p class="lead">돈의 가치는 가만히 있으면 줄어들어요</p>
+</section>
+
+<section class="slide" data-part="PART 1 · 돈과 투자" data-title="인플레이션">
+  <div class="kicker">INFLATION</div>
+  <h2>물가는 계속 오른다: 인플레이션</h2>
+  <div class="body">
+    <div class="grid2">
+      <div>
+        <p class="lead">시간이 지나면 같은 돈으로 살 수 있는 물건이 줄어들어요. 이것을 <b class="hl">인플레이션</b>이라고 해요.</p>
+        <ul class="dots mt">
+          <li>물가가 매년 3% 오르면, 24년 뒤 물가는 약 <b>2배</b></li>
+          <li>그동안 현금 100만 원의 실제 가치는 약 <b class="down">절반</b></li>
+        </ul>
+      </div>
+      <div class="card warn center">
+        <div class="emoji">🍜</div>
+        <h3>짜장면 한 그릇의 가격 변화</h3>
+        <p>1990년대 초 <b>천 원대</b> → 오늘날 <b class="up">7천 원 안팎</b></p>
+        <p class="small muted mt-s">지역·가게마다 다르며 대략적인 흐름이에요.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 1 · 돈과 투자" data-title="저축과 투자">
+  <div class="kicker">SAVING vs INVESTING</div>
+  <h2>저축과 투자는 무엇이 다를까</h2>
+  <div class="body">
+    <table class="t">
+      <tr><th></th><th>저축 (예금·적금)</th><th>투자 (주식·펀드 등)</th></tr>
+      <tr><td><b>목적</b></td><td>돈을 안전하게 모으기</td><td>돈을 불리기</td></tr>
+      <tr><td><b>원금</b></td><td>보장 (예금자보호 한도 내)</td><td class="up">손실이 날 수 있음</td></tr>
+      <tr><td><b>기대 수익</b></td><td>낮지만 확정적</td><td>높을 수 있지만 불확실</td></tr>
+      <tr><td><b>어울리는 돈</b></td><td>곧 써야 할 돈, 비상금</td><td>오랫동안 쓰지 않을 여유 자금</td></tr>
+    </table>
+    <div class="note mt">둘 중 하나만 정답은 없어요. <b>돈의 용도와 기간</b>에 따라 나눠서 쓰는 거예요.</div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 1 · 돈과 투자" data-title="복리의 마법">
+  <div class="kicker">COMPOUND INTEREST</div>
+  <h2>복리: 이자에 이자가 붙는다</h2>
+  <div class="body">
+    <div class="row" style="align-items:stretch;">
+      <div style="flex:1.35;">
+        <div class="ctl">연 수익률 <input type="range" id="rateR" min="1" max="12" value="7"> <output id="rateO">7%</output></div>
+        <svg id="compoundSvg" viewBox="0 0 640 340" width="100%"></svg>
+      </div>
+      <div style="flex:1; display:flex; flex-direction:column; gap:14px; justify-content:center;">
+        <div class="card"><p class="small muted">원금 1,000만 원 · 30년 뒤</p></div>
+        <div class="card red"><p>복리: <b id="cpVal" class="up">-</b></p></div>
+        <div class="card down"><p>단리: <b id="spVal" class="down">-</b></p></div>
+        <div class="card"><p>보관만 했을 때: <b>1,000만 원</b></p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 1 · 돈과 투자" data-title="72의 법칙">
+  <div class="kicker">RULE OF 72</div>
+  <h2>72의 법칙: 돈이 2배가 되는 시간</h2>
+  <div class="body">
+    <div class="formula">72 ÷ 연 수익률(%) ≈ 원금이 2배가 되는 데 걸리는 해<small>복리일 때 쓰는 간단한 어림셈</small></div>
+    <div class="grid4 mt center">
+      <div class="card"><p class="muted small">연 2%</p><div class="big" style="font-size:52px;">36년</div></div>
+      <div class="card"><p class="muted small">연 4%</p><div class="big" style="font-size:52px;">18년</div></div>
+      <div class="card blue"><p class="muted small">연 8%</p><div class="big" style="font-size:52px;">9년</div></div>
+      <div class="card red"><p class="muted small">연 12%</p><div class="big" style="font-size:52px;">6년</div></div>
+    </div>
+    <p class="mt muted center">💡 거꾸로 물가가 연 3%씩 오르면, 돈의 가치는 약 24년 만에 절반이 돼요.</p>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 1 · 돈과 투자" data-title="위험과 수익">
+  <div class="kicker">RISK & RETURN</div>
+  <h2>공짜 점심은 없다: 위험과 수익</h2>
+  <div class="body">
+    <div class="row">
+      <svg viewBox="0 0 560 360" width="560">
+        <line x1="60" y1="310" x2="530" y2="310" stroke="#1b2536" stroke-width="2"/>
+        <line x1="60" y1="310" x2="60" y2="30" stroke="#1b2536" stroke-width="2"/>
+        <text x="520" y="340" text-anchor="end" font-size="16" fill="#66768c">위험(가격 변동) →</text>
+        <text x="20" y="40" font-size="16" fill="#66768c" transform="rotate(-90 20 40)" text-anchor="end">기대 수익 →</text>
+        <path d="M80 290 Q 260 230 510 60" stroke="#c9d8fb" stroke-width="10" fill="none" stroke-linecap="round"/>
+        <circle cx="110" cy="282" r="12" fill="#0f9d6b"/><text x="130" y="276" font-size="17" font-weight="700">예금</text>
+        <circle cx="210" cy="252" r="12" fill="#0a7fb0"/><text x="230" y="246" font-size="17" font-weight="700">채권</text>
+        <circle cx="330" cy="196" r="12" fill="#2563eb"/><text x="350" y="190" font-size="17" font-weight="700">주식형 펀드·ETF</text>
+        <circle cx="430" cy="128" r="12" fill="#e5334a"/><text x="380" y="106" font-size="17" font-weight="700">개별 주식</text>
+      </svg>
+      <div style="flex:1;">
+        <p class="lead">수익을 더 기대할수록 <b class="up">가격이 크게 흔들릴 위험</b>도 함께 커져요.</p>
+        <div class="note red mt">"위험 없이 고수익 보장"이라는 말은 <b>사기를 의심</b>해야 하는 신호예요.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 1 · 돈과 투자" data-title="투자 자산의 종류">
+  <div class="kicker">ASSET CLASSES</div>
+  <h2>무엇에 투자할 수 있을까</h2>
+  <div class="body">
+    <div class="grid3">
+      <div class="card"><div class="emoji">🏦</div><h3>예금·적금</h3><p>은행에 맡기고 정해진 이자를 받아요.</p></div>
+      <div class="card"><div class="emoji">📜</div><h3>채권</h3><p>정부나 기업에 돈을 빌려주고 이자를 받아요.</p></div>
+      <div class="card blue"><div class="emoji">🏢</div><h3>주식</h3><p>회사의 주인(주주)이 되어 성장의 몫을 나눠 가져요.</p></div>
+      <div class="card"><div class="emoji">🧺</div><h3>펀드·ETF</h3><p>여러 자산을 한 바구니에 담아 한 번에 투자해요.</p></div>
+      <div class="card"><div class="emoji">🏠</div><h3>부동산</h3><p>집·건물에 투자하고 임대료나 시세차익을 얻어요.</p></div>
+      <div class="card"><div class="emoji">🪙</div><h3>원자재·금</h3><p>금·원유처럼 실물 자원 가격에 투자해요.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════ PART 2 ═════════════ -->
+<section class="slide part" data-title="PART 2 주식과 주식시장">
+  <div class="num">02</div>
+  <h1>주식과 주식시장</h1>
+  <p class="lead">주식을 산다는 것은 회사의 일부를 소유하는 것</p>
+</section>
+
+<section class="slide" data-part="PART 2 · 주식과 시장" data-title="주식이란">
+  <div class="kicker">WHAT IS A STOCK</div>
+  <h2>주식 = 회사를 잘게 나눈 소유권</h2>
+  <div class="body">
+    <div class="row">
+      <svg viewBox="0 0 320 320" width="320">
+        <circle cx="160" cy="160" r="140" fill="#e8efff"/>
+        <path d="M160 160 L160 20 A140 140 0 0 1 281 230 Z" fill="#2563eb"/>
+        <path d="M160 160 L281 230 A140 140 0 0 1 60 258 Z" fill="#0a7fb0"/>
+        <path d="M160 160 L60 258 A140 140 0 0 1 30 110 Z" fill="#93b4f5"/>
+        <text x="215" y="120" fill="#fff" font-size="20" font-weight="700">40%</text>
+        <text x="170" y="250" fill="#fff" font-size="20" font-weight="700">30%</text>
+        <text x="62" y="190" fill="#fff" font-size="18" font-weight="700">15%</text>
+        <text x="80" y="95" fill="#2563eb" font-size="18" font-weight="700">나</text>
+      </svg>
+      <div style="flex:1;">
+        <p class="lead">회사를 피자 한 판이라 하면, 주식은 <b class="hl">피자 조각</b>이에요.</p>
+        <ul class="dots mt">
+          <li>주식 1주를 사면 그만큼 회사의 <b>주인(주주)</b>이 돼요.</li>
+          <li>많이 가질수록 회사에 대한 권리가 커져요.</li>
+          <li>회사가 커지면 내 조각의 가치도 커져요.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 2 · 주식과 시장" data-title="회사는 왜 주식을 발행할까">
+  <div class="kicker">WHY ISSUE STOCKS</div>
+  <h2>회사는 왜 주식을 팔까?</h2>
+  <div class="body">
+    <div class="grid3 center">
+      <div class="card"><div class="emoji">💡</div><h3>1. 아이디어</h3><p>좋은 사업 아이디어가 있지만 돈이 부족해요.</p></div>
+      <div class="card blue"><div class="emoji">🤝</div><h3>2. 주식 발행</h3><p>회사의 일부를 주식으로 나눠 투자자에게 팔아요.</p></div>
+      <div class="card green"><div class="emoji">🏭</div><h3>3. 성장</h3><p>모은 돈으로 공장을 짓고 사람을 뽑아 사업을 키워요.</p></div>
+    </div>
+    <div class="note mt">회사가 처음으로 주식시장에 주식을 공개하고 파는 것을 <b>IPO(기업공개)</b> 또는 <b>상장</b>이라고 해요.</div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 2 · 주식과 시장" data-title="주주의 권리">
+  <div class="kicker">SHAREHOLDER RIGHTS</div>
+  <h2>주주가 되면 생기는 권리</h2>
+  <div class="body">
+    <div class="grid3">
+      <div class="card blue"><div class="emoji">🗳️</div><h3>의결권</h3><p>주주총회에서 회사의 중요한 결정(이사 선임 등)에 투표해요. 1주에 1표!</p></div>
+      <div class="card green"><div class="emoji">💰</div><h3>배당받을 권리</h3><p>회사가 번 이익의 일부를 주식 수에 비례해 나눠 받아요.</p></div>
+      <div class="card"><div class="emoji">📦</div><h3>잔여재산 분배</h3><p>회사가 문을 닫으면 빚을 갚고 남은 재산을 나눠 받아요.</p></div>
+    </div>
+    <p class="mt muted center">주주는 회사가 망해도 <b>투자한 돈만큼만</b> 손해를 봐요(유한책임).</p>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 2 · 주식과 시장" data-title="주식으로 돈을 버는 방법">
+  <div class="kicker">HOW TO EARN</div>
+  <h2>주식으로 돈을 버는 두 가지 방법</h2>
+  <div class="body">
+    <div class="grid2">
+      <div class="card red">
+        <div class="emoji">📈</div><h3>① 시세차익</h3>
+        <p>싼 가격에 사서 비싼 가격에 팔아 생기는 차이예요.</p>
+        <p class="mt-s"><b>10,000원</b>에 사서 <b class="up">13,000원</b>에 팔면 → <b class="up">+3,000원 (+30%)</b></p>
+      </div>
+      <div class="card green">
+        <div class="emoji">💵</div><h3>② 배당</h3>
+        <p>주식을 가지고 있기만 해도 회사가 이익을 나눠 줘요.</p>
+        <p class="mt-s">1주당 배당금 <b>500원</b> × 100주 → <b class="up">50,000원</b></p>
+      </div>
+    </div>
+    <div class="note warn mt">반대로 산 가격보다 싸게 팔면 <b class="down">손실</b>이 생겨요. 배당도 회사 사정에 따라 줄거나 없어질 수 있어요.</div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 2 · 주식과 시장" data-title="주식시장">
+  <div class="kicker">STOCK MARKETS</div>
+  <h2>주식은 어디서 사고팔까: 증권거래소</h2>
+  <div class="body">
+    <div class="grid2">
+      <div class="card blue">
+        <h3>🇰🇷 한국</h3>
+        <ul class="dots">
+          <li><b>코스피(KOSPI) 시장</b>: 규모가 큰 대표 기업들</li>
+          <li><b>코스닥(KOSDAQ) 시장</b>: 성장 중인 기술·벤처 기업들</li>
+        </ul>
+        <p class="small muted mt-s">운영: 한국거래소(KRX)</p>
+      </div>
+      <div class="card red">
+        <h3>🇺🇸 미국</h3>
+        <ul class="dots">
+          <li><b>뉴욕증권거래소(NYSE)</b>: 세계 최대 규모의 거래소</li>
+          <li><b>나스닥(NASDAQ)</b>: 애플·엔비디아 같은 기술 기업이 많음</li>
+        </ul>
+        <p class="small muted mt-s">세계 주식시장 시가총액의 절반 가까이가 미국</p>
+      </div>
+    </div>
+    <p class="mt center muted">투자자는 <b>증권사</b>를 통해 거래소에 주문을 내요.</p>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 2 · 주식과 시장" data-title="시장 운영 시간">
+  <div class="kicker">MARKET HOURS</div>
+  <h2>주식시장은 언제 열릴까 (한국 시간)</h2>
+  <div class="body">
+    <svg viewBox="0 0 1120 210" width="100%">
+      <rect x="40" y="40" width="1040" height="40" rx="8" fill="#f3f6fb"/>
+      <rect x="40" y="130" width="1040" height="40" rx="8" fill="#f3f6fb"/>
+      <!-- 0~24h → 40~1080, 1h = 43.33px -->
+      <rect x="430" y="40" width="282" height="40" rx="8" fill="#2563eb"/>
+      <text x="571" y="66" text-anchor="middle" fill="#fff" font-size="16" font-weight="700">09:00 ~ 15:30</text>
+      <rect x="1013" y="130" width="67" height="40" rx="8" fill="#e5334a"/>
+      <rect x="40" y="130" width="260" height="40" rx="8" fill="#e5334a"/>
+      <text x="170" y="156" text-anchor="middle" fill="#fff" font-size="16" font-weight="700">~ 06:00 (겨울)</text>
+      <rect x="40" y="130" width="217" height="40" rx="8" fill="none" stroke="#fff" stroke-dasharray="4 3" stroke-width="2"/>
+      <text x="10" y="66" font-size="18">🇰🇷</text>
+      <text x="10" y="156" font-size="18">🇺🇸</text>
+      <g font-size="14" fill="#66768c" text-anchor="middle">
+        <text x="40" y="200">0시</text><text x="300" y="200">6시</text><text x="560" y="200">12시</text><text x="820" y="200">18시</text><text x="1080" y="200">24시</text>
+      </g>
+    </svg>
+    <div class="grid2 mt">
+      <div class="card blue"><p>🇰🇷 <b>한국</b>: 평일 09:00 ~ 15:30</p></div>
+      <div class="card red"><p>🇺🇸 <b>미국</b>: 23:30 ~ 06:00<br><span class="small muted">서머타임(3월 중순~11월 초)에는 22:30 ~ 05:00</span></p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 2 · 주식과 시장" data-title="종목코드 읽기">
+  <div class="kicker">TICKER</div>
+  <h2>종목코드: 주식의 이름표</h2>
+  <div class="body">
+    <div class="grid2">
+      <div class="card red">
+        <h3>🇺🇸 미국: 알파벳 약자 (티커)</h3>
+        <table class="t mt-s">
+          <tr><td><b>AAPL</b></td><td>애플</td></tr>
+          <tr><td><b>MSFT</b></td><td>마이크로소프트</td></tr>
+          <tr><td><b>NVDA</b></td><td>엔비디아</td></tr>
+          <tr><td><b>KO</b></td><td>코카콜라</td></tr>
+        </table>
+      </div>
+      <div class="card blue">
+        <h3>🇰🇷 한국: 숫자 6자리 + 시장</h3>
+        <table class="t mt-s">
+          <tr><td><b>005930.KS</b></td><td>삼성전자</td></tr>
+          <tr><td><b>000660.KS</b></td><td>SK하이닉스</td></tr>
+          <tr><td><b>035720.KS</b></td><td>카카오</td></tr>
+        </table>
+        <p class="small muted mt-s"><b>.KS</b> = 코스피, <b>.KQ</b> = 코스닥 (모의투자 사이트에서 쓰는 표기)</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 2 · 주식과 시장" data-title="주가는 어떻게 정해질까">
+  <div class="kicker">PRICE DISCOVERY</div>
+  <h2>주가는 어떻게 정해질까?</h2>
+  <div class="body">
+    <div class="row">
+      <div style="flex:1;">
+        <p class="lead">주가는 <b>사려는 사람(수요)</b>과 <b>팔려는 사람(공급)</b>이 만나는 가격에서 정해져요.</p>
+        <ul class="dots mt">
+          <li>사려는 사람이 더 많으면 → 주가 <b class="up">상승 ▲</b></li>
+          <li>팔려는 사람이 더 많으면 → 주가 <b class="down">하락 ▼</b></li>
+        </ul>
+      </div>
+      <div class="card" style="width:420px;">
+        <h3 class="center">호가창 예시</h3>
+        <table class="t" style="font-size:17px;">
+          <tr><td class="down">팔자 120주</td><td class="center"><b>10,200</b></td><td></td></tr>
+          <tr><td class="down">팔자 80주</td><td class="center"><b>10,100</b></td><td></td></tr>
+          <tr><td></td><td class="center" style="background:#ffe58a;"><b>10,000</b></td><td class="up">사자 150주</td></tr>
+          <tr><td></td><td class="center"><b>9,900</b></td><td class="up">사자 200주</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 2 · 주식과 시장" data-title="시가총액">
+  <div class="kicker">MARKET CAP</div>
+  <h2>시가총액: 회사의 몸값</h2>
+  <div class="body">
+    <div class="formula">시가총액 = 주가 × 발행 주식 수</div>
+    <div class="grid2 mt">
+      <div class="card">
+        <h3>A회사</h3>
+        <p>주가 <b>100,000원</b> × 100만 주</p>
+        <p class="mt-s">= 시가총액 <b>1,000억 원</b></p>
+      </div>
+      <div class="card blue">
+        <h3>B회사</h3>
+        <p>주가 <b>10,000원</b> × 1억 주</p>
+        <p class="mt-s">= 시가총액 <b class="up">1조 원</b></p>
+      </div>
+    </div>
+    <div class="note mt">주가가 비싸다고 큰 회사가 아니에요! 회사의 크기는 <b>시가총액</b>으로 비교해요.</div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 2 · 주식과 시장" data-title="주가지수">
+  <div class="kicker">STOCK INDEX</div>
+  <h2>주가지수: 시장 전체의 온도계</h2>
+  <div class="body">
+    <p class="lead">수많은 주식의 움직임을 하나의 숫자로 나타낸 것이 <b>주가지수</b>예요.</p>
+    <div class="grid4 mt">
+      <div class="card blue"><h3>KOSPI</h3><p class="small">코스피 시장 전체 종목</p></div>
+      <div class="card blue"><h3>KOSDAQ</h3><p class="small">코스닥 시장 전체 종목</p></div>
+      <div class="card red"><h3>S&amp;P 500</h3><p class="small">미국 대표 기업 500개</p></div>
+      <div class="card red"><h3>NASDAQ 종합</h3><p class="small">나스닥 상장 종목, 기술주 중심</p></div>
+    </div>
+    <div class="note mt">"오늘 코스피가 1% 올랐다" = 한국 주식시장이 <b>전반적으로</b> 올랐다는 뜻이에요. 내 주식은 반대로 갈 수도 있어요.</div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 2 · 주식과 시장" data-title="ETF">
+  <div class="kicker">ETF</div>
+  <h2>ETF: 지수를 통째로 사는 방법</h2>
+  <div class="body">
+    <div class="grid2">
+      <div>
+        <p class="lead"><b>ETF(상장지수펀드)</b>는 여러 종목을 한 바구니에 담아 주식처럼 사고팔 수 있게 만든 상품이에요.</p>
+        <ul class="dots mt">
+          <li>1주만 사도 수십~수백 개 기업에 나눠 투자하는 효과</li>
+          <li>특정 기업 하나가 망해도 충격이 작아요</li>
+          <li>예: S&amp;P 500 지수를 따라가는 ETF (SPY, VOO 등)</li>
+        </ul>
+      </div>
+      <div class="card blue center">
+        <div class="emoji">🧺</div>
+        <h3>개별 주식 vs ETF</h3>
+        <p>개별 주식: 계란 <b>1개</b></p>
+        <p>ETF: 계란 <b>한 판</b></p>
+        <p class="small muted mt-s">처음 투자하는 사람에게 자주 권하는 방식이에요.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════ PART 3 역사 ═════════════ -->
+<section class="slide part" data-title="PART 3 주식의 역사">
+  <div class="num">03</div>
+  <h1>주식의 역사</h1>
+  <p class="lead">400년 전 바다 위 모험에서 시작된 이야기</p>
+</section>
+
+<section class="slide" data-part="PART 3 · 주식의 역사" data-title="최초의 주식회사">
+  <div class="kicker">1602 · NETHERLANDS</div>
+  <h2>최초의 주식회사: 네덜란드 동인도회사</h2>
+  <div class="body">
+    <div class="row">
+      <div class="card blue center" style="width:340px;"><div class="emoji" style="font-size:90px;">⛵</div><h3>1602년 네덜란드</h3><p class="small">세계 최초로 주식을 발행한 회사</p></div>
+      <div style="flex:1;">
+        <p class="lead">아시아에서 후추 같은 향신료를 실어 오는 항해는 큰돈을 벌 수 있었지만, 배가 폭풍이나 해적을 만나면 <b class="down">전부 잃는</b> 위험한 사업이었어요.</p>
+        <ul class="dots mt">
+          <li>그래서 <b>많은 사람이 조금씩 돈을 모으고</b></li>
+          <li>배가 무사히 돌아오면 <b>낸 돈만큼 이익을 나눠 갖기로</b> 했어요</li>
+          <li>이 "돈을 낸 증서"가 바로 <b class="hl">주식</b>의 시작!</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 3 · 주식의 역사" data-title="위험을 나누는 지혜">
+  <div class="kicker">WHY IT WORKED</div>
+  <h2>주식은 "위험을 나누는 발명품"</h2>
+  <div class="body">
+    <div class="grid2">
+      <div class="card down center">
+        <div class="emoji">🧍⛵</div><h3>혼자서 배 1척에 투자</h3>
+        <p>배가 가라앉으면 <b class="down">재산 전부를 잃어요.</b></p>
+      </div>
+      <div class="card green center">
+        <div class="emoji">👨‍👩‍👧‍👦⛵⛵⛵</div><h3>여럿이 함께 여러 배에 투자</h3>
+        <p>배 1척이 가라앉아도 <b>손해를 나눠서</b> 견딜 수 있어요.</p>
+      </div>
+    </div>
+    <div class="note mt">400년 전의 이 생각이 오늘날 <b>분산투자</b>의 원리와 똑같아요. 사람들이 이 증서를 서로 사고팔기 시작하면서 <b>암스테르담 증권거래소</b>가 생겨났어요!</div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 3 · 주식의 역사" data-title="월스트리트의 탄생">
+  <div class="kicker">1792 · NEW YORK</div>
+  <h2>나무 아래서 시작된 월스트리트</h2>
+  <div class="body">
+    <div class="row">
+      <div class="card center" style="width:340px;"><div class="emoji" style="font-size:90px;">🌳</div><h3>버튼우드 협정</h3><p class="small">1792년, 뉴욕 월가의 버튼우드(플라타너스) 나무 아래</p></div>
+      <div style="flex:1;">
+        <p class="lead">24명의 중개인이 나무 아래 모여 "정해진 규칙과 수수료로 우리끼리 주식을 거래하자"고 약속했어요.</p>
+        <ul class="dots mt">
+          <li>이 약속이 자라서 <b>뉴욕증권거래소(NYSE)</b>가 되었어요</li>
+          <li>월스트리트(Wall Street)는 지금 세계 금융의 중심지예요</li>
+          <li>시장이 굴러가려면 <b>모두가 지키는 규칙과 신뢰</b>가 필요해요</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 3 · 주식의 역사" data-title="대공황">
+  <div class="kicker">1929 · GREAT DEPRESSION</div>
+  <h2>1929년 대공황: 빚으로 쌓은 탑이 무너지다</h2>
+  <div class="body">
+    <div class="grid2">
+      <div>
+        <p class="lead">1920년대 미국에서는 "주식은 오르기만 한다"며 많은 사람이 <b class="up">빚을 내서</b> 주식을 샀어요.</p>
+        <ul class="dots mt">
+          <li>1929년 10월, 주가가 갑자기 폭락 (검은 목요일·검은 화요일)</li>
+          <li>빚을 갚지 못한 사람과 은행이 연달아 무너짐</li>
+          <li>수많은 사람이 일자리를 잃는 <b>대공황</b>으로 이어짐</li>
+        </ul>
+      </div>
+      <div class="card blue">
+        <h3>📌 남긴 교훈</h3>
+        <ul class="dots">
+          <li><b>빚내서 하는 투자</b>는 매우 위험하다</li>
+          <li>이후 미국은 <b>증권거래위원회(SEC)</b>를 만들어 시장을 감시하기 시작했어요</li>
+          <li>공정한 규칙이 투자자를 보호한다</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 3 · 주식의 역사" data-title="한국 주식시장의 역사">
+  <div class="kicker">KOREA</div>
+  <h2>한국 주식시장의 발자취</h2>
+  <div class="body">
+    <svg viewBox="0 0 1120 230" width="100%">
+      <line x1="40" y1="110" x2="1080" y2="110" stroke="#2563eb" stroke-width="5" stroke-linecap="round"/>
+      <g font-size="17" text-anchor="middle">
+        <circle cx="110" cy="110" r="12" fill="#2563eb"/><text x="110" y="75" font-weight="900" fill="#2563eb">1956</text><text x="110" y="150">대한증권거래소</text><text x="110" y="174">문을 열다</text>
+        <circle cx="290" cy="110" r="12" fill="#2563eb"/><text x="290" y="75" font-weight="900" fill="#2563eb">1980</text><text x="290" y="150">코스피 지수</text><text x="290" y="174">기준점(100)</text>
+        <circle cx="470" cy="110" r="12" fill="#2563eb"/><text x="470" y="75" font-weight="900" fill="#2563eb">1996</text><text x="470" y="150">코스닥 시장</text><text x="470" y="174">문을 열다</text>
+        <circle cx="650" cy="110" r="12" fill="#1d6fe0"/><text x="650" y="75" font-weight="900" fill="#1d6fe0">1997</text><text x="650" y="150">외환위기(IMF)</text><text x="650" y="174">주가 폭락</text>
+        <circle cx="830" cy="110" r="12" fill="#1d6fe0"/><text x="830" y="75" font-weight="900" fill="#1d6fe0">2008</text><text x="830" y="150">세계</text><text x="830" y="174">금융위기</text>
+        <circle cx="1010" cy="110" r="12" fill="#e5334a"/><text x="1010" y="75" font-weight="900" fill="#e5334a">2020</text><text x="1010" y="150">'동학개미'</text><text x="1010" y="174">개인 투자 열풍</text>
+      </g>
+    </svg>
+    <div class="note">코스피 지수는 1980년 1월 4일을 <b>100</b>으로 정해 출발했어요. 위기와 회복을 반복하며 수십 배로 커졌고, 지금 뉴스에 나오는 코스피 숫자도 그 기준에서 계산한 거예요.</div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 3 · 주식의 역사" data-title="IMF 외환위기와 금 모으기">
+  <div class="kicker">1997 · IMF CRISIS</div>
+  <h2>1997년 외환위기와 금 모으기 운동</h2>
+  <div class="body">
+    <div class="grid2">
+      <div>
+        <p class="lead">나라에 달러가 바닥나 국제통화기금(IMF)에서 돈을 빌려야 했던 위기예요.</p>
+        <ul class="dots mt">
+          <li>많은 기업이 무너지고 주가가 크게 떨어졌어요</li>
+          <li>환율이 1달러에 2,000원 가까이까지 치솟았어요</li>
+          <li>국민들이 집에 있던 <b>금을 모아</b> 나라 빚 갚기에 힘을 보탰어요</li>
+        </ul>
+      </div>
+      <div class="card green">
+        <h3>📌 생각해 볼 점</h3>
+        <ul class="dots">
+          <li>위기는 반복되지만 시장은 결국 <b>회복</b>해 왔어요</li>
+          <li>무리하게 빚을 진 기업이 먼저 무너졌어요</li>
+          <li>그래서 기업 분석에서 <b>부채비율</b>을 꼭 봐야 해요</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 3 · 주식의 역사" data-title="역사에서 배우는 교훈">
+  <div class="kicker">LESSONS</div>
+  <h2>역사가 알려 주는 3가지 교훈</h2>
+  <div class="body">
+    <div class="grid3">
+      <div class="card blue"><div class="emoji">🔄</div><h3>위기는 반복된다</h3><p>폭락은 꼭 다시 와요. "이번엔 다르다"는 말을 조심해요.</p></div>
+      <div class="card red"><div class="emoji">💳</div><h3>빚투는 위험하다</h3><p>대공황도 외환위기도 빚이 문제를 키웠어요.</p></div>
+      <div class="card green"><div class="emoji">📈</div><h3>길게 보면 성장한다</h3><p>세계 경제는 위기를 넘으며 계속 성장해 왔어요.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════ PART 4 ═════════════ -->
+<section class="slide part" data-title="PART 4 주가를 움직이는 힘">
+  <div class="num">04</div>
+  <h1>주가를 움직이는 힘</h1>
+  <p class="lead">실적, 금리, 환율, 뉴스, 그리고 사람의 마음</p>
+</section>
+
+<section class="slide" data-part="PART 4 · 주가를 움직이는 힘" data-title="주가의 원동력: 기업 실적">
+  <div class="kicker">EARNINGS</div>
+  <h2>장기적으로 주가는 실적을 따라간다</h2>
+  <div class="body">
+    <div class="row">
+      <svg viewBox="0 0 560 320" width="560">
+        <line x1="40" y1="280" x2="540" y2="280" stroke="#dfe6f0" stroke-width="2"/>
+        <g fill="#c9d8fb">
+          <rect x="70" y="220" width="50" height="60" rx="4"/><rect x="160" y="200" width="50" height="80" rx="4"/>
+          <rect x="250" y="170" width="50" height="110" rx="4"/><rect x="340" y="140" width="50" height="140" rx="4"/>
+          <rect x="430" y="90" width="50" height="190" rx="4"/>
+        </g>
+        <polyline points="95,230 140,205 185,215 230,185 275,175 320,150 365,160 410,120 455,95 500,70" fill="none" stroke="#e5334a" stroke-width="4" stroke-linejoin="round"/>
+        <text x="60" y="305" font-size="15" fill="#66768c">1년차</text><text x="420" y="305" font-size="15" fill="#66768c">5년차</text>
+        <rect x="60" y="20" width="16" height="16" fill="#c9d8fb"/><text x="84" y="34" font-size="15">이익</text>
+        <line x1="140" y1="28" x2="160" y2="28" stroke="#e5334a" stroke-width="4"/><text x="168" y="34" font-size="15">주가</text>
+      </svg>
+      <div style="flex:1;">
+        <p class="lead">단기적으로는 오르락내리락하지만, 길게 보면 <b>돈을 잘 버는 회사의 주가가 오르는</b> 경향이 있어요.</p>
+        <div class="note mt">"단기적으로 시장은 투표기, 장기적으로는 저울이다." <br><span class="small muted">— 벤저민 그레이엄 (가치투자의 아버지)</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 4 · 주가를 움직이는 힘" data-title="실적 발표">
+  <div class="kicker">EARNINGS REPORT</div>
+  <h2>실적 발표: 기대와 결과의 싸움</h2>
+  <div class="body">
+    <p class="lead">회사는 3개월(분기)마다 실적을 발표해요. 주가는 <b>"얼마나 벌었나"</b>보다 <b>"기대보다 잘했나"</b>에 반응해요.</p>
+    <div class="grid3 mt">
+      <div class="card red center"><h3>어닝 서프라이즈</h3><p>기대보다 실적이 좋음</p><p class="big up" style="font-size:44px;">▲</p></div>
+      <div class="card center"><h3>예상 부합</h3><p>기대만큼 실적이 나옴</p><p class="big muted" style="font-size:44px;">―</p></div>
+      <div class="card down center"><h3>어닝 쇼크</h3><p>기대보다 실적이 나쁨</p><p class="big down" style="font-size:44px;">▼</p></div>
+    </div>
+    <p class="mt muted center">💡 이익이 늘었는데 주가가 떨어지는 일도 생겨요. 시장의 기대가 더 높았기 때문이에요.</p>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 4 · 주가를 움직이는 힘" data-title="금리">
+  <div class="kicker">INTEREST RATE</div>
+  <h2>금리: 돈의 가격</h2>
+  <div class="body">
+    <div class="grid2">
+      <div class="card down">
+        <h3>금리가 오르면 ⬆️</h3>
+        <ul class="dots">
+          <li>예금 이자가 매력적 → 주식에서 돈이 빠져나감</li>
+          <li>기업의 이자 부담 증가 → 이익 감소</li>
+          <li>일반적으로 주가에 <b class="down">부담</b></li>
+        </ul>
+      </div>
+      <div class="card red">
+        <h3>금리가 내리면 ⬇️</h3>
+        <ul class="dots">
+          <li>예금 이자가 낮아짐 → 주식으로 돈이 몰림</li>
+          <li>돈 빌리기 쉬워져 투자·소비 증가</li>
+          <li>일반적으로 주가에 <b class="up">호재</b></li>
+        </ul>
+      </div>
+    </div>
+    <div class="note mt">기준금리는 한국은행, 미국은 <b>연방준비제도(연준, Fed)</b>가 정해요. 연준의 발표는 전 세계 주식시장을 흔들어요.</div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 4 · 주가를 움직이는 힘" data-title="환율">
+  <div class="kicker">EXCHANGE RATE</div>
+  <h2>환율: 미국 주식을 살 때 꼭 봐야 할 것</h2>
+  <div class="body">
+    <p class="lead">미국 주식은 달러로 사요. 그래서 <b>주가</b>와 <b>환율</b>이 함께 내 수익을 결정해요.</p>
+    <table class="t mt">
+      <tr><th>상황</th><th>주가(달러)</th><th>환율(원/달러)</th><th>원화 기준 수익</th></tr>
+      <tr><td>주가 ▲, 환율 ▲</td><td class="up">+10%</td><td class="up">1,300 → 1,430 (+10%)</td><td class="up"><b>약 +21%</b></td></tr>
+      <tr><td>주가 ▲, 환율 ▼</td><td class="up">+10%</td><td class="down">1,430 → 1,300 (−9%)</td><td><b>약 0%</b></td></tr>
+      <tr><td>주가 ―, 환율 ▲</td><td>0%</td><td class="up">+10%</td><td class="up"><b>+10%</b></td></tr>
+    </table>
+    <p class="mt small muted">※ 우리 모의투자는 모든 자산을 달러로 계산해요. 그래서 한국 주식은 반대로 환율의 영향을 받아요.</p>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 4 · 주가를 움직이는 힘" data-title="경기 순환">
+  <div class="kicker">BUSINESS CYCLE</div>
+  <h2>경기는 돌고 돈다</h2>
+  <div class="body">
+    <div class="row">
+      <svg viewBox="0 0 560 300" width="560">
+        <path d="M20 200 C 90 200, 110 60, 180 60 S 270 240, 340 240 S 450 60, 540 60" fill="none" stroke="#2563eb" stroke-width="5"/>
+        <circle cx="180" cy="60" r="9" fill="#e5334a"/><text x="180" y="40" text-anchor="middle" font-size="17" font-weight="700">호황</text>
+        <circle cx="260" cy="150" r="9" fill="#b45309"/><text x="296" y="140" font-size="17" font-weight="700">후퇴</text>
+        <circle cx="340" cy="240" r="9" fill="#1d6fe0"/><text x="340" y="275" text-anchor="middle" font-size="17" font-weight="700">불황</text>
+        <circle cx="425" cy="150" r="9" fill="#0f9d6b"/><text x="392" y="140" text-anchor="end" font-size="17" font-weight="700">회복</text>
+      </svg>
+      <div style="flex:1;">
+        <ul class="dots">
+          <li><b>호황</b>: 소비·투자 활발, 기업 이익 증가</li>
+          <li><b>후퇴</b>: 성장이 둔해지고 물가·금리 부담</li>
+          <li><b>불황</b>: 소비 위축, 실업 증가</li>
+          <li><b>회복</b>: 금리 인하 등으로 다시 성장</li>
+        </ul>
+        <p class="small muted mt-s">주식시장은 보통 실제 경기보다 <b>6개월쯤 먼저</b> 움직인다고 해요.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 4 · 주가를 움직이는 힘" data-title="뉴스와 이슈">
+  <div class="kicker">NEWS</div>
+  <h2>뉴스는 주가를 어떻게 움직일까</h2>
+  <div class="body">
+    <div class="grid2">
+      <div class="card red"><h3>📰 호재 (좋은 소식)</h3><ul class="dots"><li>신제품 대박, 대형 계약 체결</li><li>정부 지원 정책 발표</li><li>경쟁사의 실수</li></ul></div>
+      <div class="card down"><h3>📰 악재 (나쁜 소식)</h3><ul class="dots"><li>제품 리콜, 사고, 소송</li><li>새로운 규제, 관세</li><li>전쟁·재난·전염병</li></ul></div>
+    </div>
+    <div class="note warn mt">"소문에 사고 뉴스에 팔아라"라는 말이 있어요. 모두가 아는 뉴스는 <b>이미 주가에 반영</b>되었을 가능성이 높아요.</div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 4 · 주가를 움직이는 힘" data-title="뉴스 연결 활동">
+  <div class="kicker">ACTIVITY</div>
+  <h2>활동: 이 뉴스, 누구에게 호재일까?</h2>
+  <div class="body">
+    <div class="quiz-item"><div class="q">① 국제 유가가 크게 올랐다</div><div class="a">정유·에너지 기업 ▲ / 항공사·운송 기업 ▼ (연료비 부담)</div><button onclick="reveal(this)">정답</button></div>
+    <div class="quiz-item"><div class="q">② 원/달러 환율이 크게 올랐다 (원화 약세)</div><div class="a">수출 기업 ▲ (해외에서 번 달러의 가치↑) / 수입 원료가 많은 기업 ▼</div><button onclick="reveal(this)">정답</button></div>
+    <div class="quiz-item"><div class="q">③ AI 데이터센터 투자가 폭발적으로 늘었다</div><div class="a">반도체·전력 설비·냉각 장비 기업 ▲</div><button onclick="reveal(this)">정답</button></div>
+    <div class="quiz-item"><div class="q">④ 기록적인 폭염이 이어지고 있다</div><div class="a">에어컨·음료·빙과 기업 ▲ / 야외 레저·농산물 관련 기업 ▼</div><button onclick="reveal(this)">정답</button></div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 4 · 주가를 움직이는 힘" data-title="투자 심리">
+  <div class="kicker">SENTIMENT</div>
+  <h2>공포와 탐욕: 시장의 감정</h2>
+  <div class="body">
+    <svg viewBox="0 0 1100 120" width="100%">
+      <defs><linearGradient id="fg" x1="0" x2="1"><stop offset="0" stop-color="#1d6fe0"/><stop offset="0.5" stop-color="#dfe6f0"/><stop offset="1" stop-color="#e5334a"/></linearGradient></defs>
+      <rect x="20" y="30" width="1060" height="36" rx="18" fill="url(#fg)"/>
+      <text x="20" y="100" font-size="20" font-weight="700" fill="#1d6fe0">극단적 공포 😱</text>
+      <text x="1080" y="100" text-anchor="end" font-size="20" font-weight="700" fill="#e5334a">극단적 탐욕 🤑</text>
+    </svg>
+    <div class="grid2 mt">
+      <div class="card down"><p><b>공포</b>가 클 때는 좋은 기업도 함께 헐값에 팔려요.</p></div>
+      <div class="card red"><p><b>탐욕</b>이 클 때는 가치 없는 주식도 비싸게 팔려요.</p></div>
+    </div>
+    <div class="note mt">"남들이 탐욕스러울 때 두려워하고, 남들이 두려워할 때 탐욕스러워져라." <span class="small muted">— 워런 버핏</span></div>
+  </div>
+</section>
+
+<!-- ═════════════ PART 4 ═════════════ -->
+<section class="slide part" data-title="PART 5 좋은 기업 찾기">
+  <div class="num">05</div>
+  <h1>좋은 기업 찾기</h1>
+  <p class="lead">기본적 분석: 회사의 진짜 가치를 따져 보기</p>
+</section>
+
+<section class="slide" data-part="PART 5 · 기업 분석" data-title="두 가지 분석법">
+  <div class="kicker">ANALYSIS</div>
+  <h2>주식을 분석하는 두 가지 방법</h2>
+  <div class="body">
+    <div class="grid2">
+      <div class="card blue">
+        <div class="emoji">🏢</div><h3>기본적 분석</h3>
+        <p><b>"무엇을 살까?"</b></p>
+        <ul class="dots mt-s"><li>기업의 실적, 재무 상태, 산업 전망</li><li>회사의 진짜 가치를 계산</li><li>장기 투자에 주로 활용</li></ul>
+      </div>
+      <div class="card red">
+        <div class="emoji">📊</div><h3>기술적 분석</h3>
+        <p><b>"언제 살까?"</b></p>
+        <ul class="dots mt-s"><li>과거 주가와 거래량의 흐름(차트)</li><li>투자자들의 심리와 추세를 읽음</li><li>단기 매매에 주로 활용</li></ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 5 · 기업 분석" data-title="사업 이해하기">
+  <div class="kicker">BUSINESS MODEL</div>
+  <h2>첫 번째 질문: 이 회사는 어떻게 돈을 벌까?</h2>
+  <div class="body">
+    <ol class="steps">
+      <li><b>무엇을 파나요?</b> 제품·서비스, 주요 고객은 누구인가</li>
+      <li><b>왜 사람들이 이 회사를 선택하나요?</b> 품질, 가격, 브랜드, 기술</li>
+      <li><b>앞으로 더 많이 팔 수 있나요?</b> 시장이 커지고 있는가</li>
+      <li><b>위험 요소는 무엇인가요?</b> 경쟁자, 규제, 원자재 가격</li>
+    </ol>
+    <div class="note mt">"자신이 이해하지 못하는 사업에는 투자하지 마라." <span class="small muted">— 워런 버핏</span></div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 5 · 기업 분석" data-title="재무제표">
+  <div class="kicker">FINANCIAL STATEMENTS</div>
+  <h2>재무제표: 회사의 건강검진표</h2>
+  <div class="body">
+    <div class="grid3">
+      <div class="card blue"><div class="emoji">⚖️</div><h3>재무상태표</h3><p>특정 시점에 회사가 가진 <b>재산(자산)</b>과 <b>빚(부채)</b>, <b>자본</b></p></div>
+      <div class="card green"><div class="emoji">🧾</div><h3>손익계산서</h3><p>일정 기간 동안 <b>얼마나 팔고(매출) 얼마나 남겼는지(이익)</b></p></div>
+      <div class="card"><div class="emoji">💧</div><h3>현금흐름표</h3><p>실제로 <b>현금이 들어오고 나간</b> 흐름</p></div>
+    </div>
+    <div class="formula mt">자산 = 부채 + 자본<small>내 돈(자본)과 빌린 돈(부채)을 합쳐 재산(자산)을 마련한다</small></div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 5 · 기업 분석" data-title="매출과 이익">
+  <div class="kicker">INCOME STATEMENT</div>
+  <h2>손익계산서 읽기: 떡볶이 가게 예시</h2>
+  <div class="body">
+    <div class="row" style="align-items:flex-start;">
+      <table class="t" style="flex:1.2;">
+        <tr><th>항목</th><th>금액(1년)</th></tr>
+        <tr><td><b>매출액</b> (떡볶이 판매)</td><td>1억 원</td></tr>
+        <tr><td>− 원재료비 (떡, 어묵, 소스)</td><td>4,000만 원</td></tr>
+        <tr><td>− 월세, 직원 월급, 광고비</td><td>4,000만 원</td></tr>
+        <tr><td><b>영업이익</b> (장사로 번 돈)</td><td class="up"><b>2,000만 원</b></td></tr>
+        <tr><td>− 대출 이자, 세금</td><td>500만 원</td></tr>
+        <tr><td><b>순이익</b> (최종으로 남은 돈)</td><td class="up"><b>1,500만 원</b></td></tr>
+      </table>
+      <div style="flex:1;" class="card blue">
+        <h3>영업이익률</h3>
+        <p>영업이익 ÷ 매출액<br>= 2,000 ÷ 10,000 = <b class="up">20%</b></p>
+        <p class="small muted mt-s">같은 업종끼리 비교하면 누가 더 효율적으로 장사하는지 알 수 있어요.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 5 · 기업 분석" data-title="PER">
+  <div class="kicker">VALUATION ①</div>
+  <h2>PER: 이익에 비해 주가가 비싼가?</h2>
+  <div class="body">
+    <div class="formula">PER = 주가 ÷ 주당순이익(EPS)<small>= 시가총액 ÷ 순이익 · "이 회사 이익의 몇 년 치 가격인가"</small></div>
+    <div class="grid2 mt">
+      <div class="card">
+        <p>🍢 1년에 <b>1,000만 원</b> 버는 떡볶이 가게를 <b>1억 원</b>에 산다면?</p>
+        <p class="mt-s">PER = 1억 ÷ 1,000만 = <b class="up">10배</b></p>
+        <p class="small muted mt-s">10년 동안 번 돈으로 가게 값을 되찾는다는 뜻이에요. 주식도 똑같이 "주가 ÷ 1주당 이익"으로 계산해요.</p>
+      </div>
+      <div class="card blue">
+        <ul class="dots">
+          <li>PER이 <b>낮으면</b>: 이익에 비해 싸다(저평가?)</li>
+          <li>PER이 <b>높으면</b>: 비싸다 or 앞으로 크게 성장할 거란 기대</li>
+          <li><b>같은 업종끼리</b> 비교해야 의미가 있어요</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 5 · 기업 분석" data-title="PBR">
+  <div class="kicker">VALUATION ②</div>
+  <h2>PBR: 회사의 재산에 비해 주가는?</h2>
+  <div class="body">
+    <div class="formula">PBR = 주가 ÷ 주당순자산(BPS)<small>= 시가총액 ÷ 자본 · "회사를 지금 정리하면 받을 몫과 비교"</small></div>
+    <div class="grid3 mt center">
+      <div class="card down"><h3>PBR &lt; 1</h3><p>회사를 팔아 나눠 갖는 돈보다 주가가 싸다</p><p class="small muted mt-s">저평가 or 돈을 잘 못 번다</p></div>
+      <div class="card"><h3>PBR = 1</h3><p>주가와 장부상 가치가 같다</p></div>
+      <div class="card red"><h3>PBR &gt; 1</h3><p>장부상 재산보다 비싸게 거래된다</p><p class="small muted mt-s">브랜드·기술 같은 보이지 않는 가치를 인정받음</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 5 · 기업 분석" data-title="ROE">
+  <div class="kicker">PROFITABILITY</div>
+  <h2>ROE: 주주의 돈으로 얼마나 잘 벌었나</h2>
+  <div class="body">
+    <div class="formula">ROE = 순이익 ÷ 자본 × 100 (%)<small>🍋 내 돈 10만 원으로 레모네이드 가게를 열어 1년에 2만 원을 남기면 ROE 20%</small></div>
+    <div class="grid2 mt">
+      <div class="card">
+        <h3>A회사</h3><p>자본 1,000억 원으로 순이익 50억 원</p><p class="mt-s">ROE = <b>5%</b></p>
+      </div>
+      <div class="card red">
+        <h3>B회사</h3><p>자본 1,000억 원으로 순이익 200억 원</p><p class="mt-s">ROE = <b class="up">20%</b></p>
+      </div>
+    </div>
+    <div class="note mt">ROE가 꾸준히 높은 회사는 <b>돈을 굴리는 실력</b>이 좋은 회사예요. 다만 빚을 많이 내서 ROE를 높인 건 아닌지 <b>부채비율</b>도 함께 확인해요.</div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 5 · 기업 분석" data-title="부채비율과 배당수익률">
+  <div class="kicker">STABILITY & DIVIDEND</div>
+  <h2>안정성과 배당도 확인하기</h2>
+  <div class="body">
+    <div class="grid2">
+      <div class="card blue">
+        <h3>부채비율</h3>
+        <div class="formula" style="font-size:22px; padding:16px;">부채 ÷ 자본 × 100</div>
+        <p class="mt-s">빚이 자기 돈에 비해 얼마나 많은지 보여 줘요. 일반적으로 <b>100% 이하</b>면 안정적이라고 봐요(업종마다 달라요).</p>
+      </div>
+      <div class="card green">
+        <h3>배당수익률</h3>
+        <div class="formula" style="font-size:22px; padding:16px;">1주당 배당금 ÷ 주가 × 100</div>
+        <p class="mt-s">주가 50,000원, 배당금 2,000원 → <b class="up">4%</b><br>은행 이자처럼 받는 꾸준한 수입이에요.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 5 · 기업 분석" data-title="지표 비교 실습">
+  <div class="kicker">PRACTICE</div>
+  <h2>실습: 어느 회사에 투자하고 싶나요?</h2>
+  <div class="body">
+    <table class="t">
+      <tr><th>지표 (가상의 회사)</th><th>🍪 과자왕</th><th>🤖 로봇테크</th><th>🏗️ 튼튼건설</th></tr>
+      <tr><td>매출 성장률(최근 3년 평균)</td><td>3%</td><td class="up"><b>35%</b></td><td>−5%</td></tr>
+      <tr><td>PER</td><td>12배</td><td class="up">60배</td><td class="down">5배</td></tr>
+      <tr><td>ROE</td><td>14%</td><td>8%</td><td>3%</td></tr>
+      <tr><td>부채비율</td><td>40%</td><td>30%</td><td class="up">250%</td></tr>
+      <tr><td>배당수익률</td><td>3.5%</td><td>0%</td><td>1%</td></tr>
+    </table>
+    <p class="mt muted center">💬 모둠별로 토론: 각 회사의 장점과 위험은 무엇일까? 정답은 없어요. <b>근거</b>를 말해 보세요.</p>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 5 · 기업 분석" data-title="경제적 해자">
+  <div class="kicker">ECONOMIC MOAT</div>
+  <h2>경제적 해자: 경쟁자를 막는 성벽</h2>
+  <div class="body">
+    <p class="lead">성 주위에 판 물웅덩이(해자)처럼, 경쟁자가 쉽게 따라 할 수 없는 회사만의 강점이에요.</p>
+    <div class="grid4 mt">
+      <div class="card"><div class="emoji">👑</div><h3>브랜드</h3><p class="small">비싸도 그 브랜드를 고르는 힘</p></div>
+      <div class="card"><div class="emoji">🌐</div><h3>네트워크 효과</h3><p class="small">쓰는 사람이 많을수록 더 좋아지는 서비스</p></div>
+      <div class="card"><div class="emoji">🔒</div><h3>전환 비용</h3><p class="small">다른 제품으로 바꾸기 번거로움</p></div>
+      <div class="card"><div class="emoji">🔬</div><h3>기술·특허</h3><p class="small">남들이 만들기 어려운 기술력</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 5 · 기업 분석" data-title="좋은 기업 체크리스트">
+  <div class="kicker">CHECKLIST</div>
+  <h2>좋은 기업 체크리스트</h2>
+  <div class="body">
+    <div class="grid2" style="gap:12px 40px;">
+      <p>☑️ 무슨 일로 돈을 버는지 설명할 수 있다</p>
+      <p>☑️ 매출과 이익이 꾸준히 늘고 있다</p>
+      <p>☑️ 경쟁자가 따라오기 어려운 강점이 있다</p>
+      <p>☑️ 빚이 지나치게 많지 않다</p>
+      <p>☑️ 산업 자체가 성장하고 있다</p>
+      <p>☑️ 같은 업종에 비해 주가가 너무 비싸지 않다</p>
+      <p>☑️ 경영진이 믿을 만하다</p>
+      <p>☑️ 위험 요소를 알고 있다</p>
+    </div>
+    <div class="note mt">좋은 기업이 항상 좋은 주식은 아니에요. <b>좋은 기업을 적당한 가격에</b> 사는 것이 중요해요.</div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 5 · 기업 분석" data-title="정보는 어디서 찾을까">
+  <div class="kicker">RESEARCH</div>
+  <h2>기업 정보는 어디서 찾을까?</h2>
+  <div class="body">
+    <div class="grid3">
+      <div class="card blue"><h3>📑 공식 자료</h3><ul class="dots"><li class="small">DART 전자공시 (한국)</li><li class="small">SEC EDGAR (미국)</li><li class="small">회사 홈페이지 IR 자료</li></ul></div>
+      <div class="card"><h3>📰 뉴스·리포트</h3><ul class="dots"><li class="small">경제 신문, 증권사 리포트</li><li class="small">포털 증권 섹션</li><li class="small">Yahoo Finance 등</li></ul></div>
+      <div class="card green"><h3>🤖 AI 도구</h3><ul class="dots"><li class="small">어려운 용어 설명</li><li class="small">자료 요약, 질문 정리</li><li class="small">반드시 원문·숫자 확인!</li></ul></div>
+    </div>
+    <div class="note warn mt">AI나 유튜브의 말을 그대로 믿지 말고, <b>출처와 날짜</b>를 확인하는 습관을 들여요.</div>
+  </div>
+</section>
+
+<!-- ═════════════ PART 5 ═════════════ -->
+<section class="slide part" data-title="PART 6 차트 읽기 기초">
+  <div class="num">06</div>
+  <h1>차트 읽기 기초</h1>
+  <p class="lead">기술적 분석: 가격과 거래량 속 투자자의 흔적</p>
+</section>
+
+<section class="slide" data-part="PART 6 · 차트 읽기" data-title="캔들차트">
+  <div class="kicker">CANDLESTICK</div>
+  <h2>캔들(봉) 하나 읽기</h2>
+  <div class="body">
+    <div class="row">
+      <svg viewBox="0 0 520 380" width="520">
+        <line x1="130" y1="30" x2="130" y2="350" stroke="#e5334a" stroke-width="4"/>
+        <rect x="90" y="100" width="80" height="170" fill="#e5334a" rx="3"/>
+        <text x="130" y="375" text-anchor="middle" font-size="18" font-weight="700" fill="#e5334a">양봉 (상승)</text>
+        <g font-size="15" fill="#1b2536">
+          <line x1="175" y1="30" x2="205" y2="30" stroke="#66768c"/><text x="210" y="35">고가</text>
+          <line x1="175" y1="100" x2="205" y2="100" stroke="#66768c"/><text x="210" y="105"><tspan font-weight="700">종가</tspan></text>
+          <line x1="175" y1="270" x2="205" y2="270" stroke="#66768c"/><text x="210" y="275"><tspan font-weight="700">시가</tspan></text>
+          <line x1="175" y1="350" x2="205" y2="350" stroke="#66768c"/><text x="210" y="355">저가</text>
+        </g>
+        <line x1="390" y1="30" x2="390" y2="350" stroke="#1d6fe0" stroke-width="4"/>
+        <rect x="350" y="100" width="80" height="170" fill="#1d6fe0" rx="3"/>
+        <text x="390" y="375" text-anchor="middle" font-size="18" font-weight="700" fill="#1d6fe0">음봉 (하락)</text>
+        <g font-size="15">
+          <text x="440" y="105" font-weight="700">시가</text>
+          <text x="440" y="275" font-weight="700">종가</text>
+        </g>
+      </svg>
+      <div style="flex:1;">
+        <ul class="dots">
+          <li><b>시가</b>: 시작 가격 / <b>종가</b>: 마지막 가격</li>
+          <li><b>고가·저가</b>: 그날 가장 높은·낮은 가격 (꼬리)</li>
+          <li><b class="up">빨간 양봉</b>: 종가 &gt; 시가 (올랐다)</li>
+          <li><b class="down">파란 음봉</b>: 종가 &lt; 시가 (내렸다)</li>
+        </ul>
+        <div class="note warn mt small">⚠️ 미국 차트는 반대로 <b>상승=초록, 하락=빨강</b>을 써요. 헷갈리지 않게 주의!</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 6 · 차트 읽기" data-title="추세">
+  <div class="kicker">TREND</div>
+  <h2>추세: 가격이 흐르는 방향</h2>
+  <div class="body">
+    <div class="grid3 center">
+      <div class="card red"><svg viewBox="0 0 240 140" width="100%"><polyline points="10,120 50,90 70,100 110,60 130,75 170,35 190,45 230,15" fill="none" stroke="#e5334a" stroke-width="4"/><line x1="10" y1="125" x2="230" y2="45" stroke="#e5334a" stroke-dasharray="6 5" opacity=".5"/></svg><h3>상승 추세</h3><p class="small">저점과 고점이 계속 높아짐</p></div>
+      <div class="card"><svg viewBox="0 0 240 140" width="100%"><polyline points="10,70 40,45 70,95 100,48 130,92 160,46 190,94 230,60" fill="none" stroke="#66768c" stroke-width="4"/><line x1="10" y1="42" x2="230" y2="42" stroke="#66768c" stroke-dasharray="6 5" opacity=".5"/><line x1="10" y1="98" x2="230" y2="98" stroke="#66768c" stroke-dasharray="6 5" opacity=".5"/></svg><h3>횡보 (박스권)</h3><p class="small">일정한 범위에서 오르내림</p></div>
+      <div class="card down"><svg viewBox="0 0 240 140" width="100%"><polyline points="10,15 50,50 70,40 110,80 130,65 170,105 190,95 230,125" fill="none" stroke="#1d6fe0" stroke-width="4"/><line x1="10" y1="10" x2="230" y2="95" stroke="#1d6fe0" stroke-dasharray="6 5" opacity=".5"/></svg><h3>하락 추세</h3><p class="small">저점과 고점이 계속 낮아짐</p></div>
+    </div>
+    <p class="mt center lead">"추세는 친구다(Trend is your friend)" — 흐름을 거스르면 위험해요.</p>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 6 · 차트 읽기" data-title="이동평균선">
+  <div class="kicker">MOVING AVERAGE</div>
+  <h2>이동평균선: 흐름을 부드럽게 보기</h2>
+  <div class="body">
+    <div class="row">
+      <svg id="maSvg" viewBox="0 0 620 330" width="620"></svg>
+      <div style="flex:1;">
+        <p>최근 N일 종가의 <b>평균</b>을 이어 그린 선이에요.</p>
+        <ul class="dots mt-s">
+          <li><b style="color:#b45309;">5일선</b>: 단기 흐름</li>
+          <li><b style="color:#2563eb;">20일선</b>: 한 달 흐름</li>
+        </ul>
+        <div class="card mt-s"><p class="small"><b class="up">골든크로스</b>: 단기선이 장기선을 뚫고 올라감 → 상승 신호로 봄<br><b class="down">데드크로스</b>: 단기선이 장기선 아래로 내려감 → 하락 신호로 봄</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 6 · 차트 읽기" data-title="거래량">
+  <div class="kicker">VOLUME</div>
+  <h2>거래량: 얼마나 많은 사람이 참여했나</h2>
+  <div class="body">
+    <div class="grid2">
+      <div>
+        <p class="lead">거래량은 일정 기간 동안 사고팔린 주식의 수예요.</p>
+        <ul class="dots mt">
+          <li>거래량이 늘면서 주가가 오른다 → 관심이 몰리는 <b class="up">힘 있는 상승</b></li>
+          <li>거래량 없이 주가만 오른다 → 힘이 약할 수 있음</li>
+          <li>갑자기 거래량이 폭발한다 → 중요한 뉴스가 있었는지 확인!</li>
+        </ul>
+      </div>
+      <svg viewBox="0 0 480 300" width="100%">
+        <polyline points="20,170 70,165 120,172 170,160 220,150 270,110 320,80 370,70 420,60 460,55" fill="none" stroke="#e5334a" stroke-width="4"/>
+        <g fill="#c9d8fb">
+          <rect x="10" y="260" width="20" height="30"/><rect x="60" y="265" width="20" height="25"/><rect x="110" y="258" width="20" height="32"/>
+          <rect x="160" y="255" width="20" height="35"/><rect x="210" y="245" width="20" height="45"/>
+          <rect x="260" y="200" width="20" height="90" fill="#2563eb"/><rect x="310" y="210" width="20" height="80" fill="#2563eb"/>
+          <rect x="360" y="240" width="20" height="50"/><rect x="410" y="250" width="20" height="40"/><rect x="450" y="255" width="20" height="35"/>
+        </g>
+        <text x="20" y="20" font-size="15" fill="#66768c">주가 (위) · 거래량 (아래)</text>
+      </svg>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 6 · 차트 읽기" data-title="차트의 한계">
+  <div class="kicker">LIMITS</div>
+  <h2>차트는 미래를 알려 주지 않는다</h2>
+  <div class="body">
+    <div class="grid2">
+      <div class="card warn">
+        <h3>⚠️ 기억해야 할 점</h3>
+        <ul class="dots">
+          <li>차트는 <b>과거의 기록</b>일 뿐이에요.</li>
+          <li>같은 차트를 보고도 사람마다 해석이 달라요.</li>
+          <li>예상하지 못한 뉴스 하나로 패턴이 무너져요.</li>
+        </ul>
+      </div>
+      <div class="card blue">
+        <h3>✅ 이렇게 활용해요</h3>
+        <ul class="dots">
+          <li>기업 분석으로 <b>무엇을</b> 살지 정하고</li>
+          <li>차트로 너무 급하게 오른 건 아닌지 <b>참고</b>해요</li>
+          <li>차트만 보고 사고파는 것은 피해요</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════ PART 6 ═════════════ -->
+<section class="slide part" data-title="PART 7 투자 전략과 위험 관리">
+  <div class="num">07</div>
+  <h1>투자 전략과 위험 관리</h1>
+  <p class="lead">많이 버는 것보다 크게 잃지 않는 것이 먼저</p>
+</section>
+
+<section class="slide" data-part="PART 7 · 전략과 위험 관리" data-title="손실의 비대칭">
+  <div class="kicker">MATH OF LOSSES</div>
+  <h2>잃는 것은 쉽고, 되찾는 것은 어렵다</h2>
+  <div class="body">
+    <div class="row">
+      <table class="t" style="flex:1;">
+        <tr><th>손실</th><th>원금 회복에 필요한 수익</th></tr>
+        <tr><td class="down">−10%</td><td class="up">+11%</td></tr>
+        <tr><td class="down">−20%</td><td class="up">+25%</td></tr>
+        <tr><td class="down">−30%</td><td class="up">+43%</td></tr>
+        <tr><td class="down"><b>−50%</b></td><td class="up"><b>+100%</b></td></tr>
+        <tr><td class="down">−80%</td><td class="up">+400%</td></tr>
+      </table>
+      <div style="flex:1;" class="card red">
+        <p class="lead">$10,000이 −50% 되면 $5,000.<br>다시 $10,000이 되려면 <b class="up">2배(+100%)</b>가 올라야 해요.</p>
+        <p class="mt-s muted">"투자의 제1원칙: 돈을 잃지 마라. 제2원칙: 제1원칙을 잊지 마라." — 워런 버핏</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 7 · 전략과 위험 관리" data-title="분산투자">
+  <div class="kicker">DIVERSIFICATION</div>
+  <h2>달걀을 한 바구니에 담지 마라</h2>
+  <div class="body">
+    <div class="grid2">
+      <div class="card down center">
+        <div class="emoji">🧺💥</div><h3>한 종목에 몰빵</h3>
+        <p>그 회사에 문제가 생기면 자산 전체가 크게 흔들려요.</p>
+        <p class="mt-s">한 종목 <b class="down">−40%</b> → 내 자산 <b class="down">−40%</b></p>
+      </div>
+      <div class="card green center">
+        <div class="emoji">🧺🧺🧺🧺</div><h3>5개 종목에 나눠서</h3>
+        <p>하나가 무너져도 나머지가 버텨 줘요.</p>
+        <p class="mt-s">한 종목 <b class="down">−40%</b> → 내 자산 <b>−8%</b></p>
+      </div>
+    </div>
+    <div class="note mt">분산투자는 수익을 극대화하는 방법이 아니라 <b>살아남는 방법</b>이에요.</div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 7 · 전략과 위험 관리" data-title="제대로 분산하기">
+  <div class="kicker">SMART DIVERSIFICATION</div>
+  <h2>종목 수만 늘린다고 분산이 아니다</h2>
+  <div class="body">
+    <div class="grid2">
+      <div class="card warn">
+        <h3>❌ 가짜 분산</h3>
+        <p>반도체 회사 5개에 나눠 투자</p>
+        <p class="small muted mt-s">반도체 경기가 나빠지면 5개가 <b>같이</b> 떨어져요.</p>
+      </div>
+      <div class="card green">
+        <h3>✅ 진짜 분산</h3>
+        <p>성격이 다른 곳에 나눠 투자</p>
+        <ul class="dots mt-s small">
+          <li class="small"><b>업종</b>: IT · 식품 · 헬스케어 · 금융 · 에너지</li>
+          <li class="small"><b>국가</b>: 한국 · 미국</li>
+          <li class="small"><b>성격</b>: 성장주 · 배당주</li>
+        </ul>
+      </div>
+    </div>
+    <p class="mt center muted">💡 경기가 나빠도 사람들은 밥을 먹고, 약을 사고, 전기를 써요. 이런 업종을 <b>경기방어주</b>라고 해요.</p>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 7 · 전략과 위험 관리" data-title="성장주와 가치주">
+  <div class="kicker">STYLES</div>
+  <h2>성장주 vs 가치주</h2>
+  <div class="body">
+    <table class="t">
+      <tr><th></th><th>🚀 성장주</th><th>💎 가치주</th></tr>
+      <tr><td><b>특징</b></td><td>매출·이익이 빠르게 늘어남</td><td>실제 가치보다 싸게 거래됨</td></tr>
+      <tr><td><b>PER</b></td><td>높은 편</td><td>낮은 편</td></tr>
+      <tr><td><b>배당</b></td><td>적거나 없음 (재투자)</td><td>꾸준한 편</td></tr>
+      <tr><td><b>가격 변동</b></td><td class="up">큼</td><td>상대적으로 작음</td></tr>
+      <tr><td><b>예시 업종</b></td><td>AI, 반도체, 바이오, 플랫폼</td><td>은행, 통신, 유틸리티, 식품</td></tr>
+    </table>
+    <p class="mt center muted">어느 쪽이 항상 이기지는 않아요. 시기마다 강한 쪽이 바뀌어요.</p>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 7 · 전략과 위험 관리" data-title="장기투자와 단기매매">
+  <div class="kicker">TIME HORIZON</div>
+  <h2>장기투자 vs 단기매매</h2>
+  <div class="body">
+    <div class="grid2">
+      <div class="card blue">
+        <h3>🌳 장기투자</h3>
+        <ul class="dots"><li>좋은 기업의 성장을 함께 누림</li><li>매일 시세를 볼 필요가 적음</li><li>복리 효과를 크게 받음</li><li>필요한 것: <b>인내심</b></li></ul>
+      </div>
+      <div class="card red">
+        <h3>⚡ 단기매매</h3>
+        <ul class="dots"><li>짧은 가격 변동에서 이익을 노림</li><li>많은 시간과 집중력 필요</li><li>거래 비용이 쌓임</li><li>연구에 따르면 <b>대부분의 개인은 손해</b></li></ul>
+      </div>
+    </div>
+    <div class="note mt">우리 모의투자 기간은 짧지만, <b>"이 회사를 3년 들고 있어도 괜찮을까?"</b>라는 질문으로 종목을 골라 보세요.</div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 7 · 전략과 위험 관리" data-title="분할매수">
+  <div class="kicker">DOLLAR COST AVERAGING</div>
+  <h2>분할매수: 한 번에 다 사지 않기</h2>
+  <div class="body">
+    <div class="row">
+      <table class="t" style="flex:1.2;">
+        <tr><th>회차</th><th>주가</th><th>투자금</th><th>산 주식 수</th></tr>
+        <tr><td>1회</td><td>$100</td><td>$1,000</td><td>10주</td></tr>
+        <tr><td>2회</td><td class="down">$80</td><td>$1,000</td><td>12.5주</td></tr>
+        <tr><td>3회</td><td class="down">$50</td><td>$1,000</td><td>20주</td></tr>
+        <tr><td>4회</td><td>$100</td><td>$1,000</td><td>10주</td></tr>
+        <tr><td><b>합계</b></td><td>평균 매수가 <b class="up">$76</b></td><td>$4,000</td><td><b>52.5주</b></td></tr>
+      </table>
+      <div style="flex:1;" class="card blue">
+        <p>주가가 처음 가격($100)으로 돌아왔을 뿐인데</p>
+        <p class="mt-s">52.5주 × $100 = <b class="up">$5,250 (+31%)</b></p>
+        <p class="small muted mt-s">떨어질 때 더 많이 사게 되어 평균 단가가 낮아져요. 타이밍을 맞추려는 부담도 줄어요.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 7 · 전략과 위험 관리" data-title="손절과 익절">
+  <div class="kicker">EXIT RULES</div>
+  <h2>언제 팔까? 미리 정해 두기</h2>
+  <div class="body">
+    <div class="grid2">
+      <div class="card down">
+        <h3>✂️ 손절 (손실을 끊기)</h3>
+        <p>"−15%가 되면 판다"처럼 기준을 정해 더 큰 손실을 막아요.</p>
+        <p class="small muted mt-s">단, 기준을 정할 땐 <b>투자 이유가 깨졌는지</b>를 함께 봐요.</p>
+      </div>
+      <div class="card red">
+        <h3>🎯 익절 (이익을 확정)</h3>
+        <p>목표 가격에 도달하거나 회사가 너무 비싸졌다고 판단되면 일부를 팔아요.</p>
+        <p class="small muted mt-s">한 번에 다 팔지 않고 나눠 파는 방법도 있어요.</p>
+      </div>
+    </div>
+    <div class="note warn mt">가장 중요한 건 <b>사기 전에</b> 파는 기준을 정하는 거예요. 사고 나면 감정이 판단을 흐려요.</div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 7 · 전략과 위험 관리" data-title="비중 조절">
+  <div class="kicker">POSITION SIZING</div>
+  <h2>한 종목에 얼마나 넣을까?</h2>
+  <div class="body">
+    <div class="row">
+      <svg viewBox="0 0 340 340" width="340" id="pieSvg"></svg>
+      <div style="flex:1;">
+        <h3>$70,000 포트폴리오 예시</h3>
+        <ul class="dots" id="pieLegend"></ul>
+        <div class="note mt-s small">한 종목은 전체의 <b>20~25%를 넘지 않게</b>, 현금은 기회를 위해 조금 남겨 두는 것이 일반적인 원칙이에요.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 7 · 전략과 위험 관리" data-title="리밸런싱">
+  <div class="kicker">REBALANCING</div>
+  <h2>리밸런싱: 비중을 다시 맞추기</h2>
+  <div class="body">
+    <div class="grid3 center">
+      <div class="card"><h3>처음 계획</h3><p>주식 A <b>50%</b><br>주식 B <b>50%</b></p></div>
+      <div class="card warn"><h3>시간이 흐른 뒤</h3><p>A가 많이 올라서<br>A <b class="up">70%</b> · B <b class="down">30%</b></p></div>
+      <div class="card green"><h3>리밸런싱</h3><p>A 일부를 팔아 B를 사서<br>다시 <b>50 : 50</b></p></div>
+    </div>
+    <p class="mt lead center">자연스럽게 <b class="up">비쌀 때 팔고</b> <b class="down">쌀 때 사는</b> 효과가 생겨요.</p>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 7 · 전략과 위험 관리" data-title="수익률 계산">
+  <div class="kicker">RETURN</div>
+  <h2>수익률 계산하기</h2>
+  <div class="body">
+    <div class="formula">수익률(%) = (현재 가치 − 투자 원금) ÷ 투자 원금 × 100</div>
+    <div class="grid2 mt">
+      <div class="card">
+        <h3>예제</h3>
+        <p>주당 <b>$200</b>에 <b>30주</b> 매수 → 원금 $6,000</p>
+        <p>현재 주가 <b>$230</b> → 현재 가치 $6,900</p>
+        <p class="mt-s">수익률 = 900 ÷ 6,000 × 100 = <b class="up">+15%</b></p>
+      </div>
+      <div class="card blue">
+        <h3>직접 계산해 보기</h3>
+        <div class="ctl small">매수가 $<input id="rcBuy" type="number" value="150" style="width:90px;font-size:18px;padding:4px;"> 현재가 $<input id="rcNow" type="number" value="135" style="width:90px;font-size:18px;padding:4px;"></div>
+        <p class="mt-s">수익률: <b id="rcOut" style="font-size:32px;">-</b></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 7 · 전략과 위험 관리" data-title="현실의 비용">
+  <div class="kicker">REAL WORLD</div>
+  <h2>실제 투자에는 비용이 든다</h2>
+  <div class="body">
+    <div class="grid3">
+      <div class="card"><h3>💳 수수료</h3><p>살 때와 팔 때 증권사에 내는 비용</p></div>
+      <div class="card"><h3>🏛️ 세금</h3><p>국내 주식은 팔 때 증권거래세, 해외 주식은 1년 차익 중 250만 원을 넘는 부분에 22%</p></div>
+      <div class="card"><h3>💱 환전 비용</h3><p>원화 ↔ 달러를 바꿀 때 드는 비용</p></div>
+    </div>
+    <div class="note mt">자주 사고팔수록 비용이 눈덩이처럼 커져요. 배당금에도 세금(15.4%)이 붙어요.<br><span class="small muted">※ 세율은 2026년 기준이며 법이 바뀌면 달라질 수 있어요.</span></div>
+  </div>
+</section>
+
+<!-- ═════════════ PART 7 ═════════════ -->
+<section class="slide part" data-title="PART 8 투자 심리와 흔한 실수">
+  <div class="num">08</div>
+  <h1>투자 심리와 흔한 실수</h1>
+  <p class="lead">가장 큰 적은 시장이 아니라 내 마음</p>
+</section>
+
+<section class="slide" data-part="PART 8 · 투자 심리" data-title="손실 회피">
+  <div class="kicker">LOSS AVERSION</div>
+  <h2>손실 회피: 잃는 고통은 2배</h2>
+  <div class="body">
+    <div class="grid2">
+      <div>
+        <p class="lead">사람은 <b class="up">10만 원을 얻은 기쁨</b>보다 <b class="down">10만 원을 잃은 고통</b>을 약 2배 크게 느낀다고 해요.</p>
+        <p class="small muted mt-s">행동경제학자 대니얼 카너먼 (노벨 경제학상)</p>
+      </div>
+      <div class="card warn">
+        <h3>그래서 생기는 실수</h3>
+        <ul class="dots">
+          <li>오른 주식은 <b>너무 빨리</b> 팔아 버린다</li>
+          <li>떨어진 주식은 "본전 오면 팔아야지" 하며 <b>끝까지</b> 붙든다</li>
+          <li>결국 좋은 주식은 없고 나쁜 주식만 남는다</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 8 · 투자 심리" data-title="확증 편향">
+  <div class="kicker">CONFIRMATION BIAS</div>
+  <h2>확증 편향: 보고 싶은 것만 본다</h2>
+  <div class="body">
+    <div class="row">
+      <div class="card center" style="width:360px;"><div class="emoji" style="font-size:80px;">🙈</div><p>"내 주식은 무조건 오를 거야"</p></div>
+      <div style="flex:1;">
+        <p class="lead">한 번 산 주식에 대해서는 좋은 뉴스만 찾아 읽고, 나쁜 뉴스는 무시하게 돼요.</p>
+        <div class="note mt">💡 해결법: 투자하기 전에 <b>"이 회사에 투자하면 안 되는 이유 3가지"</b>를 일부러 찾아 적어 보세요.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 8 · 투자 심리" data-title="군중 심리와 FOMO">
+  <div class="kicker">HERD & FOMO</div>
+  <h2>군중 심리와 FOMO</h2>
+  <div class="body">
+    <div class="grid2">
+      <div class="card red">
+        <h3>😰 FOMO (Fear Of Missing Out)</h3>
+        <p>"나만 빼고 다 돈 버는 것 같아!" 놓칠까 봐 두려워서 이미 많이 오른 주식을 급하게 따라 사요.</p>
+      </div>
+      <div class="card down">
+        <h3>🐑 군중 심리</h3>
+        <p>모두가 사면 따라 사고, 모두가 팔면 따라 팔아요. 그 결과 <b>가장 비쌀 때 사고 가장 쌀 때 파는</b> 일이 생겨요.</p>
+      </div>
+    </div>
+    <div class="note warn mt">친구가 "이거 오른대!"라고 할 때가 바로 <b>스스로 확인해야 할 때</b>예요.</div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 8 · 투자 심리" data-title="과잉 확신">
+  <div class="kicker">OVERCONFIDENCE</div>
+  <h2>과잉 확신: 몇 번 맞히면 천재가 된 기분</h2>
+  <div class="body">
+    <div class="grid3">
+      <div class="card"><div class="emoji">🎲</div><h3>운과 실력 혼동</h3><p>시장이 다 오를 땐 누구나 돈을 벌어요. 그게 내 실력일까요?</p></div>
+      <div class="card"><div class="emoji">🔁</div><h3>잦은 매매</h3><p>확신이 클수록 자주 사고팔고, 비용과 실수가 쌓여요.</p></div>
+      <div class="card"><div class="emoji">🎰</div><h3>무리한 베팅</h3><p>한 종목에 전부, 빚까지 내서 투자하는 위험한 행동으로 이어져요.</p></div>
+    </div>
+    <p class="mt lead center">"강세장에서는 모두가 천재다."</p>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 8 · 투자 심리" data-title="역사 속 버블">
+  <div class="kicker">BUBBLES IN HISTORY</div>
+  <h2>역사는 반복된다: 거품과 붕괴</h2>
+  <div class="body">
+    <div class="grid4">
+      <div class="card"><p class="pill">1637</p><h3 class="mt-s">튤립 파동</h3><p class="small">네덜란드에서 튤립 구근 한 개가 집 한 채 값까지 올랐다가 순식간에 폭락</p></div>
+      <div class="card"><p class="pill">2000</p><h3 class="mt-s">닷컴 버블</h3><p class="small">이름에 '.com'만 붙으면 주가가 치솟다가, 나스닥 지수가 고점 대비 약 78% 하락</p></div>
+      <div class="card"><p class="pill red">2008</p><h3 class="mt-s">금융위기</h3><p class="small">미국 부동산 대출 부실로 리먼 브라더스 파산, 세계 증시 폭락</p></div>
+      <div class="card"><p class="pill green">2020</p><h3 class="mt-s">코로나 폭락</h3><p class="small">한 달 만에 급락했지만 이후 빠르게 회복, 공포에 판 사람은 반등을 놓침</p></div>
+    </div>
+    <div class="note mt">"이번엔 다르다"는 말은 투자 역사에서 가장 비싼 말이라고 해요.</div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 8 · 투자 심리" data-title="투자 사기 주의">
+  <div class="kicker">WARNING</div>
+  <h2>🚨 이런 말은 무조건 의심하세요</h2>
+  <div class="body">
+    <div class="grid2">
+      <div class="card red">
+        <ul class="dots">
+          <li>"<b>원금 보장</b>에 월 10% 수익!"</li>
+          <li>"<b>나만 아는 정보</b>, 오늘만 알려 드림"</li>
+          <li>"리딩방 들어오면 <b>급등주</b> 찍어 드림"</li>
+          <li>"<b>지금 안 사면</b> 늦어요"</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🛡️ 나를 지키는 방법</h3>
+        <ul class="dots">
+          <li>고수익 + 무위험은 세상에 없다</li>
+          <li>모르는 사람의 투자 권유는 거절</li>
+          <li>계좌 비밀번호·인증번호는 절대 공유 금지</li>
+          <li>의심되면 금융감독원 <b>1332</b>에 상담</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 8 · 투자 심리" data-title="테마주와 급등주">
+  <div class="kicker">THEME STOCKS</div>
+  <h2>테마주·급등주의 함정</h2>
+  <div class="body">
+    <div class="row">
+      <svg viewBox="0 0 520 300" width="520">
+        <polyline points="20,250 80,245 120,240 160,200 190,120 210,60 230,40 250,90 280,170 320,220 380,240 440,250 500,255" fill="none" stroke="#e5334a" stroke-width="5" stroke-linejoin="round"/>
+        <circle cx="230" cy="40" r="8" fill="#e5334a"/>
+        <text x="245" y="35" font-size="16" font-weight="700" fill="#e5334a">여기서 산 사람은?</text>
+        <text x="20" y="290" font-size="15" fill="#66768c">실적과 상관없이 소문으로 오른 주식의 흔한 모습</text>
+      </svg>
+      <div style="flex:1;">
+        <ul class="dots">
+          <li>정치인, 유행, 소문에 따라 <b>실적과 무관하게</b> 급등</li>
+          <li>뉴스에 나올 즈음엔 이미 많이 오른 상태</li>
+          <li>먼저 산 사람이 팔기 시작하면 <b class="down">급락</b></li>
+        </ul>
+        <div class="note warn mt small">"왜 올랐는지"를 설명할 수 없다면 사지 않는 것이 원칙이에요.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 8 · 투자 심리" data-title="좋은 투자자의 습관">
+  <div class="kicker">GOOD HABITS</div>
+  <h2>좋은 투자자의 5가지 습관</h2>
+  <div class="body">
+    <ol class="steps">
+      <li><b>사기 전에 이유를 적는다</b> — 한 문장으로 설명할 수 없으면 사지 않는다</li>
+      <li><b>여유 자금으로만 투자한다</b> — 빚내서 투자하지 않는다</li>
+      <li><b>나눠서 사고, 나눠서 담는다</b> — 시간과 종목을 분산한다</li>
+      <li><b>기록하고 돌아본다</b> — 투자 일지로 성공과 실패의 원인을 찾는다</li>
+      <li><b>꾸준히 공부한다</b> — 뉴스와 기업을 보는 눈을 키운다</li>
+    </ol>
+  </div>
+</section>
+
+<!-- ═════════════ PART 9 윤리·주의사항 ═════════════ -->
+<section class="slide part" data-title="PART 9 투자 윤리와 주의사항">
+  <div class="num">09</div>
+  <h1>투자 윤리와 주의사항</h1>
+  <p class="lead">공정한 시장은 모두가 규칙을 지킬 때 만들어져요</p>
+</section>
+
+<section class="slide" data-part="PART 9 · 윤리와 주의사항" data-title="투자와 도박의 차이">
+  <div class="kicker">INVESTING ≠ GAMBLING</div>
+  <h2>투자와 도박은 무엇이 다를까?</h2>
+  <div class="body">
+    <table class="t">
+      <tr><th></th><th>📈 투자</th><th>🎰 도박</th></tr>
+      <tr><td><b>돈을 버는 원리</b></td><td>기업이 성장하며 만든 <b>새로운 가치</b>를 나눔</td><td>누군가 잃은 돈을 다른 사람이 가져감</td></tr>
+      <tr><td><b>판단 근거</b></td><td>조사, 분석, 기록</td><td>운, 감, 느낌</td></tr>
+      <tr><td><b>기간</b></td><td>오래 기다릴수록 유리할 수 있음</td><td>오래 할수록 잃을 확률이 커짐</td></tr>
+      <tr><td><b>사회에 주는 영향</b></td><td>기업에 자금을 대 일자리와 기술을 만듦</td><td>중독, 가정과 생활의 파괴</td></tr>
+    </table>
+    <div class="note red mt">근거 없이 "오를 것 같아서" 사는 순간, 주식도 <b>도박</b>이 될 수 있어요.</div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 9 · 윤리와 주의사항" data-title="청소년이 조심해야 할 것">
+  <div class="kicker">WARNING</div>
+  <h2>🚨 청소년이 특히 조심해야 할 것</h2>
+  <div class="body">
+    <div class="grid2">
+      <div class="card red">
+        <h3>❌ 절대 하면 안 되는 것</h3>
+        <ul class="dots">
+          <li>온라인 <b>불법 도박</b> 사이트 (불법 스포츠 토토, 사다리, 카지노 게임 등)</li>
+          <li>"주식 리딩방", "코인 단타방" 가입</li>
+          <li>친구에게 돈을 빌려서 투자하기</li>
+          <li>부모님 몰래 계좌·카드 사용하기</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>🛡️ 도움이 필요할 때</h3>
+        <ul class="dots">
+          <li>도박 문제 상담: <b>1336</b> (한국도박문제예방치유원)</li>
+          <li>금융 사기 의심: <b>1332</b> (금융감독원)</li>
+          <li>혼자 고민하지 말고 <b>부모님·선생님께</b> 꼭 이야기해요</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 9 · 윤리와 주의사항" data-title="공정한 시장의 규칙">
+  <div class="kicker">FAIR MARKET</div>
+  <h2>시장의 반칙: 법으로 처벌받는 행동</h2>
+  <div class="body">
+    <div class="grid3">
+      <div class="card red"><div class="emoji">🤫</div><h3>미공개 정보 이용</h3><p class="small">회사 사람만 아는 비밀 정보를 이용해 미리 주식을 사고파는 것 (내부자 거래)</p></div>
+      <div class="card red"><div class="emoji">🎭</div><h3>시세 조종</h3><p class="small">여럿이 짜고 주식을 사고팔아 가격을 일부러 올리거나 내리는 것 ("작전")</p></div>
+      <div class="card red"><div class="emoji">📢</div><h3>허위 소문 유포</h3><p class="small">거짓 정보를 퍼뜨려 주가를 움직이는 것 (SNS 게시물도 해당!)</p></div>
+    </div>
+    <div class="note mt">이런 행동은 <b>자본시장법</b>에 따라 징역형이나 큰 벌금을 받을 수 있는 범죄예요. 모두가 같은 정보로 공정하게 경쟁해야 시장이 유지돼요.</div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 9 · 윤리와 주의사항" data-title="윤리 딜레마 토론">
+  <div class="kicker">DISCUSSION</div>
+  <h2>토론: 나라면 어떻게 할까?</h2>
+  <div class="body">
+    <div class="quiz-item"><div class="q">① 친구 부모님이 "우리 회사가 다음 주에 큰 계약을 발표한다"고 말하는 걸 들었다. 그 회사 주식을 사도 될까?</div><div class="a">❌ 아직 발표되지 않은 정보로 거래하면 미공개 정보 이용이 될 수 있어요. 정보를 전해 들은 사람도 처벌받을 수 있어요.</div><button onclick="reveal(this)">생각</button></div>
+    <div class="quiz-item"><div class="q">② 내가 산 주식을 친구들도 사면 오를 것 같다. 단톡방에 "이거 곧 2배 된대!"라고 올려도 될까?</div><div class="a">❌ 근거 없는 소문은 다른 사람에게 피해를 줘요. 심하면 허위 사실 유포나 시세 조종이 될 수 있어요.</div><button onclick="reveal(this)">생각</button></div>
+    <div class="quiz-item"><div class="q">③ 모의투자 랭킹 1등 친구의 비밀번호를 알게 됐다. 장난으로 주식을 팔아도 될까?</div><div class="a">❌ 다른 사람 계정에 몰래 들어가는 것은 정보통신망법 위반이에요. 모의투자라도 실제 범죄예요.</div><button onclick="reveal(this)">생각</button></div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 9 · 윤리와 주의사항" data-title="착한 투자 ESG">
+  <div class="kicker">ESG</div>
+  <h2>착한 기업에 투자하기: ESG</h2>
+  <div class="body">
+    <p class="lead">돈을 잘 버는지뿐 아니라 <b>세상에 어떤 영향을 주는지</b>도 함께 보는 투자 방법이에요.</p>
+    <div class="grid3 mt">
+      <div class="card green"><div class="emoji">🌱</div><h3>E · 환경</h3><p class="small">탄소 배출 줄이기, 친환경 에너지, 자원 재활용</p></div>
+      <div class="card blue"><div class="emoji">🤝</div><h3>S · 사회</h3><p class="small">노동자 안전, 소비자 보호, 지역 사회 공헌, 인권</p></div>
+      <div class="card"><div class="emoji">🏛️</div><h3>G · 지배구조</h3><p class="small">투명한 경영, 정직한 회계, 주주를 공정하게 대함</p></div>
+    </div>
+    <div class="note mt">💬 생각해 보기: 돈은 잘 벌지만 환경을 오염시키는 회사에 투자해도 될까요?</div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 9 · 윤리와 주의사항" data-title="책임 있는 투자자">
+  <div class="kicker">RESPONSIBILITY</div>
+  <h2>책임 있는 투자자의 자세</h2>
+  <div class="body">
+    <div class="grid2">
+      <div class="card blue"><h3>🙋 결과는 나의 책임</h3><p>남의 추천을 따랐더라도 결정한 사람은 나예요. 남 탓보다 <b>원인을 찾는 것</b>이 실력이 돼요.</p></div>
+      <div class="card green"><h3>🤲 다른 사람을 존중</h3><p>친구의 손실을 놀리거나 내 수익을 자랑하지 않아요. 순위보다 <b>배움</b>이 중요해요.</p></div>
+      <div class="card"><h3>🔍 정직하게 기록</h3><p>실패한 투자도 숨기지 않고 일지에 적어요. 실수는 가장 좋은 선생님이에요.</p></div>
+      <div class="card warn"><h3>⚖️ 돈보다 소중한 것</h3><p>공부, 건강, 친구 관계를 해칠 만큼 주식에 빠지지 않아요.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 9 · 윤리와 주의사항" data-title="모의투자 주의사항">
+  <div class="kicker">CAUTIONS</div>
+  <h2>모의투자 활동 주의사항</h2>
+  <div class="body">
+    <div class="grid2">
+      <div class="card">
+        <h3>🔐 계정과 개인정보</h3>
+        <ul class="dots">
+          <li>비밀번호는 <b>절대 공유 금지</b>, 다른 사람 계정 사용 금지</li>
+          <li>닉네임에 <b>실명·학번·생일</b> 등 개인정보 금지</li>
+          <li>공용 컴퓨터는 사용 후 꼭 <b>로그아웃</b></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>📵 수업 태도</h3>
+        <ul class="dots">
+          <li>다른 수업 시간에 시세를 확인하지 않기</li>
+          <li>사이트 오류를 발견하면 이용하지 말고 <b>선생님께 알리기</b></li>
+          <li>모의투자 결과를 실제 투자로 바로 옮기지 않기</li>
+        </ul>
+      </div>
+    </div>
+    <div class="note red mt">해킹, 오류 악용, 타인 계정 조작은 <b>즉시 탈락</b>이며 학교 규정과 법에 따라 처리될 수 있어요.</div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 9 · 윤리와 주의사항" data-title="실제 투자를 시작한다면">
+  <div class="kicker">REAL LIFE</div>
+  <h2>나중에 실제 투자를 시작한다면</h2>
+  <div class="body">
+    <ol class="steps">
+      <li><b>미성년자는 부모님과 함께</b> — 계좌를 만들 때부터 부모님 동의가 필요해요</li>
+      <li><b>잃어도 괜찮은 돈으로, 용돈의 일부만</b> — 생활비·학원비는 절대 안 돼요</li>
+      <li><b>빚은 절대 금지</b> — 대출받아 하는 투자는 어른에게도 위험해요</li>
+      <li><b>잘 아는 곳에, 나눠서, 오래</b> — 오늘 배운 원칙을 그대로 지켜요</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 9 · 윤리와 주의사항" data-title="나의 투자 서약">
+  <div class="kicker">PLEDGE</div>
+  <h2>✍️ 나의 투자 서약서</h2>
+  <div class="body">
+    <div class="card blue" style="padding:32px 40px;">
+      <p>하나, 나는 <b>근거를 가지고</b> 판단하고, 그 이유를 기록하겠습니다.</p>
+      <p>하나, 나는 <b>거짓 정보를 퍼뜨리지 않고</b>, 시장의 규칙을 지키겠습니다.</p>
+      <p>하나, 나는 <b>다른 사람의 계정과 개인정보</b>를 존중하겠습니다.</p>
+      <p>하나, 나는 결과에 <b>책임지고</b>, 실패에서 배우겠습니다.</p>
+      <p>하나, 나는 <b>빚이나 도박</b>에 손대지 않겠습니다.</p>
+      <p class="mt" style="text-align:right;">20____년 ____월 ____일 &nbsp;&nbsp; 이름: ______________</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════ PART 10 ═════════════ -->
+<section class="slide part" data-title="PART 10 모의투자 실전 활동">
+  <div class="num">10</div>
+  <h1>모의투자 실전 활동</h1>
+  <p class="lead">배운 것을 가상 자금 $70,000으로 직접 해 보기</p>
+</section>
+
+<section class="slide" data-part="PART 10 · 모의투자 활동" data-title="모의투자 규칙">
+  <div class="kicker">RULES</div>
+  <h2>우리 반 모의투자 규칙</h2>
+  <div class="body">
+    <div class="grid3">
+      <div class="card blue"><div class="emoji">💵</div><h3>초기 자금</h3><p>가상 자금 <b>$70,000</b> 지급</p></div>
+      <div class="card"><div class="emoji">🌏</div><h3>투자 대상</h3><p>🇺🇸 미국 주식과 🇰🇷 한국 주식 (한국 주식은 달러로 환산)</p></div>
+      <div class="card"><div class="emoji">⏱️</div><h3>실제 시세</h3><p>실제 시장 가격으로 거래, 장 마감 후에는 종가 기준</p></div>
+      <div class="card green"><div class="emoji">🏆</div><h3>랭킹</h3><p>총자산과 랭킹은 평일 하루 2번 반영</p></div>
+      <div class="card warn"><div class="emoji">🙅</div><h3>개인정보 금지</h3><p>닉네임에 실명·학번 사용 금지</p></div>
+      <div class="card red"><div class="emoji">⛔</div><h3>부정행위 금지</h3><p>해킹·타인 계정 조작 시 즉시 탈락</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 10 · 모의투자 활동" data-title="모의투자 vs 실제 투자">
+  <div class="kicker">SIMULATION</div>
+  <h2>모의투자와 실제 투자는 무엇이 다를까</h2>
+  <div class="body">
+    <table class="t">
+      <tr><th></th><th>모의투자</th><th>실제 투자</th></tr>
+      <tr><td><b>돈</b></td><td>가상의 돈 (잃어도 괜찮음)</td><td>내 진짜 돈</td></tr>
+      <tr><td><b>감정</b></td><td>비교적 차분하게 판단</td><td class="up">공포와 욕심이 훨씬 강함</td></tr>
+      <tr><td><b>비용</b></td><td>단순화됨</td><td>수수료·세금·환전 비용</td></tr>
+      <tr><td><b>목적</b></td><td><b>배우고 연습하기</b></td><td>자산을 불리기</td></tr>
+    </table>
+    <div class="note mt">모의투자에서 "에라 모르겠다" 하고 한 종목에 몰빵하는 습관은 실제 투자에서 큰 손실로 이어져요. <b>진짜 내 돈이라고 생각하고</b> 투자해 보세요.</div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 10 · 모의투자 활동" data-title="투자 프로세스">
+  <div class="kicker">PROCESS</div>
+  <h2>종목을 고르는 5단계</h2>
+  <div class="body">
+    <div class="grid4" style="grid-template-columns: repeat(5, 1fr); gap:14px;">
+      <div class="card blue center"><div class="emoji">💡</div><h3>아이디어</h3><p class="small">생활 속에서 자주 쓰는 제품·서비스, 뉴스 속 트렌드</p></div>
+      <div class="card center"><div class="emoji">🔍</div><h3>조사</h3><p class="small">사업 내용, 실적, 지표, 경쟁자</p></div>
+      <div class="card center"><div class="emoji">⚖️</div><h3>판단</h3><p class="small">살 이유 vs 사면 안 되는 이유</p></div>
+      <div class="card center"><div class="emoji">🛒</div><h3>매수</h3><p class="small">금액과 비중 정하고 나눠서 매수</p></div>
+      <div class="card green center"><div class="emoji">📝</div><h3>기록·점검</h3><p class="small">투자 일지 작성, 주기적 점검</p></div>
+    </div>
+    <p class="mt center lead">이 과정을 반복하는 것이 <b>투자 실력</b>이에요.</p>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 10 · 모의투자 활동" data-title="생활 속 투자 아이디어">
+  <div class="kicker">IDEA</div>
+  <h2>투자 아이디어는 생활 속에 있다</h2>
+  <div class="body">
+    <div class="grid3">
+      <div class="card"><div class="emoji">📱</div><p>내가 매일 쓰는 스마트폰, 앱, 게임은 어느 회사 것일까?</p></div>
+      <div class="card"><div class="emoji">🛒</div><p>요즘 친구들 사이에서 유행하는 음식·옷·브랜드는?</p></div>
+      <div class="card"><div class="emoji">🚗</div><p>길에서 전기차가 늘었다면, 배터리는 누가 만들까?</p></div>
+      <div class="card"><div class="emoji">🤖</div><p>AI를 쓰는 사람이 늘면 어떤 부품이 더 필요할까?</p></div>
+      <div class="card"><div class="emoji">✈️</div><p>여행객이 늘면 항공사, 호텔, 면세점은 어떨까?</p></div>
+      <div class="card"><div class="emoji">💊</div><p>나이 든 인구가 늘면 어떤 산업이 커질까?</p></div>
+    </div>
+    <p class="mt small muted center">피터 린치: "당신이 잘 아는 것에 투자하라." 단, 아이디어는 <b>출발점</b>일 뿐, 조사는 꼭 필요해요!</p>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 10 · 모의투자 활동" data-title="AI 활용 리서치">
+  <div class="kicker">RESEARCH WITH AI</div>
+  <h2>AI를 똑똑하게 활용하는 질문법</h2>
+  <div class="body">
+    <div class="grid2">
+      <div class="card green">
+        <h3>👍 좋은 질문</h3>
+        <ul class="dots">
+          <li class="small">"OO회사는 어떤 사업으로 돈을 버는지 중학생도 알 수 있게 설명해 줘"</li>
+          <li class="small">"OO회사의 경쟁사와 비교했을 때 강점과 약점은?"</li>
+          <li class="small">"OO회사에 투자할 때 조심해야 할 위험 요소는?"</li>
+        </ul>
+      </div>
+      <div class="card red">
+        <h3>👎 피해야 할 질문</h3>
+        <ul class="dots">
+          <li class="small">"내일 오를 주식 알려 줘"</li>
+          <li class="small">"무조건 돈 버는 종목 추천해 줘"</li>
+        </ul>
+        <p class="small muted mt-s">AI도 미래는 몰라요. 숫자는 최신이 아닐 수 있으니 반드시 공식 자료로 확인해요.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 10 · 모의투자 활동" data-title="포트폴리오 설계">
+  <div class="kicker">PORTFOLIO DESIGN</div>
+  <h2>나만의 포트폴리오 설계하기</h2>
+  <div class="body">
+    <table class="t">
+      <tr><th>종목</th><th>국가</th><th>업종</th><th>성격</th><th>비중</th><th>금액</th></tr>
+      <tr><td>예) A사</td><td>🇺🇸</td><td>IT</td><td>성장주</td><td>20%</td><td>$14,000</td></tr>
+      <tr><td>예) B사</td><td>🇰🇷</td><td>반도체</td><td>성장주</td><td>15%</td><td>$10,500</td></tr>
+      <tr><td>예) C사</td><td>🇺🇸</td><td>필수소비재</td><td>배당주</td><td>15%</td><td>$10,500</td></tr>
+      <tr><td>…</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td><b>현금</b></td><td></td><td></td><td></td><td>10%</td><td>$7,000</td></tr>
+    </table>
+    <p class="mt muted center">✔️ 업종이 한쪽에 몰리지 않았나요? ✔️ 한 종목이 25%를 넘지 않나요? ✔️ 국가가 섞여 있나요?</p>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 10 · 모의투자 활동" data-title="투자 일지">
+  <div class="kicker">JOURNAL</div>
+  <h2>투자 일지 쓰기</h2>
+  <div class="body">
+    <div class="grid2">
+      <div class="card">
+        <h3>📝 매수할 때</h3>
+        <ul class="dots small">
+          <li class="small">날짜 / 종목 / 가격 / 수량</li>
+          <li class="small"><b>이 회사를 산 이유</b> (근거 2~3가지)</li>
+          <li class="small">이 투자가 틀릴 수 있는 이유</li>
+          <li class="small">언제 팔 것인가 (목표가·손절 기준)</li>
+        </ul>
+      </div>
+      <div class="card blue">
+        <h3>🔁 매도하거나 점검할 때</h3>
+        <ul class="dots small">
+          <li class="small">수익률과 그 원인</li>
+          <li class="small">처음 예상과 무엇이 달랐나?</li>
+          <li class="small">운이었나, 분석이었나?</li>
+          <li class="small">다음엔 무엇을 다르게 할까?</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 10 · 모의투자 활동" data-title="투자 일지 예시">
+  <div class="kicker">JOURNAL EXAMPLE</div>
+  <h2>투자 일지 예시</h2>
+  <div class="body">
+    <div class="card" style="font-size:19px; line-height:1.9;">
+      <p><b>📅 날짜</b> 10월 13일 &nbsp;|&nbsp; <b>🏷️ 종목</b> 가상의 '튼튼음료' &nbsp;|&nbsp; <b>🛒 매수</b> $45 × 150주 ($6,750, 전체의 약 10%)</p>
+      <p class="mt-s"><b>✅ 산 이유</b> ① 최근 3년 매출이 매년 8%씩 성장 ② 경기가 나빠도 음료 소비는 꾸준함 ③ PER이 같은 업종 평균보다 낮음</p>
+      <p><b>⚠️ 위험 요소</b> 설탕 가격 상승, 건강 트렌드로 탄산음료 소비 감소 가능성</p>
+      <p><b>🎯 매도 기준</b> 목표 $55 도달 시 절반 매도 / $38(약 −15%) 이하로 떨어지면 이유를 다시 점검</p>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 10 · 모의투자 활동" data-title="평가 기준">
+  <div class="kicker">ASSESSMENT</div>
+  <h2>평가는 수익률보다 과정!</h2>
+  <div class="body">
+    <div class="grid4">
+      <div class="card blue center"><div class="big" style="font-size:52px;">30%</div><h3>투자 근거</h3><p class="small">자료를 찾아 논리적으로 판단했나</p></div>
+      <div class="card green center"><div class="big" style="font-size:52px;">30%</div><h3>투자 일지</h3><p class="small">꾸준하고 구체적으로 기록했나</p></div>
+      <div class="card center"><div class="big" style="font-size:52px;">20%</div><h3>위험 관리</h3><p class="small">분산과 비중 조절을 했나</p></div>
+      <div class="card warn center"><div class="big" style="font-size:52px;">20%</div><h3>성찰</h3><p class="small">결과를 돌아보고 배운 점을 찾았나</p></div>
+    </div>
+    <p class="mt muted center small">※ 예시 기준이에요. 선생님이 반 상황에 맞게 바꿀 수 있어요.</p>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 10 · 모의투자 활동" data-title="정리 퀴즈">
+  <div class="kicker">QUIZ</div>
+  <h2>OX 퀴즈</h2>
+  <div class="body">
+    <div class="quiz-item"><div class="q">1. 주가가 높은 회사가 시가총액도 크다.</div><div class="a"><span class="ox down">X</span>시가총액 = 주가 × 주식 수. 주가만으로는 알 수 없어요.</div><button onclick="reveal(this)">정답</button></div>
+    <div class="quiz-item"><div class="q">2. −50% 손실을 회복하려면 +50% 수익이면 된다.</div><div class="a"><span class="ox down">X</span>+100%가 필요해요.</div><button onclick="reveal(this)">정답</button></div>
+    <div class="quiz-item"><div class="q">3. 일반적으로 금리가 오르면 주식시장에는 부담이 된다.</div><div class="a"><span class="ox up">O</span>예금 매력↑, 기업 이자 부담↑</div><button onclick="reveal(this)">정답</button></div>
+    <div class="quiz-item"><div class="q">4. 같은 업종 5개 종목을 사면 충분히 분산된 것이다.</div><div class="a"><span class="ox down">X</span>업종·국가·성격이 다른 곳에 나눠야 해요.</div><button onclick="reveal(this)">정답</button></div>
+    <div class="quiz-item"><div class="q">5. PER은 같은 업종끼리 비교해야 의미가 있다.</div><div class="a"><span class="ox up">O</span>업종마다 평균 PER이 크게 달라요.</div><button onclick="reveal(this)">정답</button></div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 10 · 모의투자 활동" data-title="용어 정리">
+  <div class="kicker">GLOSSARY</div>
+  <h2>꼭 기억할 용어</h2>
+  <div class="body">
+    <div class="grid3" style="gap:12px;">
+      <div class="card"><b>시가총액</b> <span class="small muted">주가 × 주식 수</span></div>
+      <div class="card"><b>배당</b> <span class="small muted">이익을 주주에게 나눔</span></div>
+      <div class="card"><b>PER</b> <span class="small muted">주가 ÷ 주당순이익</span></div>
+      <div class="card"><b>PBR</b> <span class="small muted">주가 ÷ 주당순자산</span></div>
+      <div class="card"><b>ROE</b> <span class="small muted">순이익 ÷ 자본</span></div>
+      <div class="card"><b>ETF</b> <span class="small muted">지수를 따라가는 펀드</span></div>
+      <div class="card"><b>양봉·음봉</b> <span class="small muted">올랐나·내렸나</span></div>
+      <div class="card"><b>이동평균선</b> <span class="small muted">N일 평균 가격선</span></div>
+      <div class="card"><b>분산투자</b> <span class="small muted">나눠서 위험 줄이기</span></div>
+      <div class="card"><b>분할매수</b> <span class="small muted">시간을 나눠 사기</span></div>
+      <div class="card"><b>손절·익절</b> <span class="small muted">손실·이익 확정 매도</span></div>
+      <div class="card"><b>리밸런싱</b> <span class="small muted">비중 다시 맞추기</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="slide" data-part="PART 10 · 모의투자 활동" data-title="회고 질문">
+  <div class="kicker">REFLECTION</div>
+  <h2>모의투자를 마치며: 돌아보기</h2>
+  <div class="body">
+    <ol class="steps">
+      <li>가장 잘한 투자와 가장 아쉬운 투자는? 그 이유는?</li>
+      <li>나는 어떤 순간에 감정적으로 사고팔았나?</li>
+      <li>수익률 1등과 나의 차이는 실력일까, 운일까?</li>
+      <li>실제 내 돈이었다면 무엇을 다르게 했을까?</li>
+      <li>앞으로 돈을 관리할 때 꼭 지키고 싶은 원칙 한 가지는?</li>
+    </ol>
+  </div>
+</section>
+
+<section class="slide cover" data-title="마무리">
+  <div class="ticker">THANKS</div>
+  <div class="kicker">WRAP-UP</div>
+  <h1>투자는 단거리가 아니라<br>마라톤이에요</h1>
+  <p class="lead mt">근거를 가지고 판단하고, 나눠서 담고, 기록하고 돌아보기.<br>오늘 배운 원칙이 평생의 금융 습관이 되기를!</p>
+  <p class="small mt" style="color:#9ec1ff;">※ 이 자료는 교육용이며 특정 종목에 대한 투자 권유가 아닙니다.</p>
+</section>
+
+</div></div>
+
+<div id="controls">
+  <button id="btnMenu" title="목차 (M)">☰</button>
+  <button id="btnPrev" title="이전 (←)">‹</button>
+  <button id="btnNext" title="다음 (→)">›</button>
+  <button id="btnFull" title="전체화면 (F)">⛶</button>
+</div>
+<div id="hint">← → 이동 · F 전체화면 · M 목차</div>
+<div id="menu"><div class="panel"><h3>슬라이드 목록</h3><div class="list" id="menuList"></div></div></div>
+
+<script>
+(function () {
+  const slides = Array.from(document.querySelectorAll(".slide"));
+  const stage = document.getElementById("stage");
+  const total = slides.length;
+  let cur = 0;
+
+  slides.forEach((s, i) => {
+    const n = document.createElement("div");
+    n.className = "pno";
+    n.textContent = `${i + 1} / ${total}`;
+    s.appendChild(n);
+  });
+
+  function fit() {
+    const s = Math.min(window.innerWidth / 1300, window.innerHeight / 740);
+    stage.style.transform = `scale(${s})`;
+  }
+  window.addEventListener("resize", fit);
+  fit();
+
+  function go(i) {
+    cur = Math.max(0, Math.min(total - 1, i));
+    slides.forEach((s, k) => s.classList.toggle("active", k === cur));
+    document.getElementById("progress").style.width = `${((cur + 1) / total) * 100}%`;
+    if (location.hash !== `#${cur + 1}`) history.replaceState(null, "", `#${cur + 1}`);
+    document.querySelectorAll("#menuList a").forEach((a, k) => a.classList.toggle("cur", k === cur));
+  }
+
+  const menu = document.getElementById("menu");
+  const list = document.getElementById("menuList");
+  slides.forEach((s, i) => {
+    const a = document.createElement("a");
+    a.href = "#";
+    a.innerHTML = `<span>${i + 1}</span>${s.dataset.title || ""}`;
+    a.onclick = (e) => { e.preventDefault(); go(i); menu.classList.remove("open"); };
+    list.appendChild(a);
+  });
+  menu.onclick = (e) => { if (e.target === menu) menu.classList.remove("open"); };
+
+  function toggleFull() {
+    if (!document.fullscreenElement) document.documentElement.requestFullscreen?.();
+    else document.exitFullscreen?.();
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.target.tagName === "INPUT") return;
+    if (["ArrowRight", "PageDown", " ", "Enter"].includes(e.key)) { e.preventDefault(); go(cur + 1); }
+    else if (["ArrowLeft", "PageUp", "Backspace"].includes(e.key)) { e.preventDefault(); go(cur - 1); }
+    else if (e.key === "Home") go(0);
+    else if (e.key === "End") go(total - 1);
+    else if (e.key === "f" || e.key === "F") toggleFull();
+    else if (e.key === "m" || e.key === "M") menu.classList.toggle("open");
+    else if (e.key === "Escape") menu.classList.remove("open");
+  });
+  document.getElementById("btnPrev").onclick = () => go(cur - 1);
+  document.getElementById("btnNext").onclick = () => go(cur + 1);
+  document.getElementById("btnFull").onclick = toggleFull;
+  document.getElementById("btnMenu").onclick = () => menu.classList.toggle("open");
+
+  let tx = null;
+  document.addEventListener("touchstart", (e) => { tx = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener("touchend", (e) => {
+    if (tx === null) return;
+    const dx = e.changedTouches[0].clientX - tx;
+    if (Math.abs(dx) > 50) go(cur + (dx < 0 ? 1 : -1));
+    tx = null;
+  });
+
+  window.reveal = (btn) => btn.closest(".quiz-item").classList.add("show");
+
+  // ── 복리 그래프 ──
+  const NS = "http://www.w3.org/2000/svg";
+  const el = (tag, attrs, text) => {
+    const n = document.createElementNS(NS, tag);
+    for (const k in attrs) n.setAttribute(k, attrs[k]);
+    if (text != null) n.textContent = text;
+    return n;
+  };
+  const fmtWon = (v) => v >= 10000 ? `${(v / 10000).toFixed(2)}억 원` : `${Math.round(v).toLocaleString()}만 원`;
+  function drawCompound() {
+    const r = Number(document.getElementById("rateR").value) / 100;
+    document.getElementById("rateO").textContent = `${Math.round(r * 100)}%`;
+    const svg = document.getElementById("compoundSvg");
+    svg.innerHTML = "";
+    const X0 = 60, X1 = 620, Y0 = 300, Y1 = 20, years = 30;
+    const maxV = 1000 * Math.pow(1 + r, years) * 1.1;
+    const x = (t) => X0 + (X1 - X0) * t / years;
+    const y = (v) => Y0 - (Y0 - Y1) * v / maxV;
+    const step = maxV > 20000 ? 10000 : maxV > 8000 ? 2000 : 1000;
+    for (let v = step; v < maxV; v += step) {
+      svg.appendChild(el("line", { x1: X0, x2: X1, y1: y(v), y2: y(v), stroke: "#eef2f8" }));
+      svg.appendChild(el("text", { x: X0 - 8, y: y(v) + 5, "text-anchor": "end", "font-size": 13, fill: "#66768c" }, v >= 10000 ? `${v / 10000}억` : `${v / 1000}천만`));
+    }
+    for (let t = 0; t <= years; t += 10) {
+      svg.appendChild(el("line", { x1: x(t), x2: x(t), y1: Y0, y2: Y1, stroke: "#eef2f8" }));
+      svg.appendChild(el("text", { x: x(t), y: Y0 + 24, "text-anchor": "middle", "font-size": 14, fill: "#66768c" }, `${t}년`));
+    }
+    svg.appendChild(el("line", { x1: X0, x2: X1, y1: Y0, y2: Y0, stroke: "#1b2536", "stroke-width": 2 }));
+    const series = [
+      { f: () => 1000, c: "#8593a6" },
+      { f: (t) => 1000 * (1 + r * t), c: "#1d6fe0" },
+      { f: (t) => 1000 * Math.pow(1 + r, t), c: "#e5334a" },
+    ];
+    series.forEach((s) => {
+      const pts = [];
+      for (let t = 0; t <= years; t++) pts.push(`${x(t)},${y(s.f(t))}`);
+      svg.appendChild(el("polyline", { points: pts.join(" "), fill: "none", stroke: s.c, "stroke-width": 4, "stroke-linejoin": "round" }));
+    });
+    document.getElementById("cpVal").textContent = fmtWon(1000 * Math.pow(1 + r, years));
+    document.getElementById("spVal").textContent = fmtWon(1000 * (1 + r * years));
+  }
+  document.getElementById("rateR").addEventListener("input", drawCompound);
+  drawCompound();
+
+  // ── 이동평균선 그래프 ──
+  (function drawMA() {
+    const svg = document.getElementById("maSvg");
+    const p = [];
+    let v = 100;
+    for (let i = 0; i < 60; i++) {
+      const trend = i < 25 ? -0.6 : 0.9;
+      v += trend + Math.sin(i * 1.7) * 2.2 + Math.cos(i * 0.9) * 1.4;
+      p.push(v);
+    }
+    const ma = (n) => p.map((_, i) => i < n - 1 ? null : p.slice(i - n + 1, i + 1).reduce((a, b) => a + b, 0) / n);
+    const lo = Math.min(...p) - 3, hi = Math.max(...p) + 3;
+    const x = (i) => 20 + i * 10;
+    const y = (val) => 300 - (val - lo) / (hi - lo) * 280;
+    const line = (arr, c, w, dash) => {
+      const pts = arr.map((val, i) => val == null ? null : `${x(i)},${y(val)}`).filter(Boolean).join(" ");
+      const attrs = { points: pts, fill: "none", stroke: c, "stroke-width": w, "stroke-linejoin": "round" };
+      if (dash) attrs["stroke-dasharray"] = dash;
+      svg.appendChild(el("polyline", attrs));
+    };
+    line(p, "#c3cbd8", 2);
+    const m5 = ma(5), m20 = ma(20);
+    line(m5, "#b45309", 3.5);
+    line(m20, "#2563eb", 3.5);
+    for (let i = 20; i < p.length; i++) {
+      if (m5[i - 1] < m20[i - 1] && m5[i] >= m20[i]) {
+        svg.appendChild(el("circle", { cx: x(i), cy: y(m20[i]), r: 10, fill: "none", stroke: "#e5334a", "stroke-width": 3 }));
+        svg.appendChild(el("text", { x: x(i) + 14, y: y(m20[i]) + 30, "font-size": 15, "font-weight": 700, fill: "#e5334a" }, "골든크로스"));
+        break;
+      }
+    }
+    svg.appendChild(el("text", { x: 20, y: 322, "font-size": 13, fill: "#66768c" }, "회색: 실제 주가(가상)"));
+  })();
+
+  // ── 포트폴리오 파이 ──
+  (function drawPie() {
+    const data = [
+      ["미국 IT 기업", 20, "#2563eb"], ["한국 반도체 기업", 15, "#0a7fb0"], ["미국 헬스케어", 15, "#0f9d6b"],
+      ["필수소비재(배당주)", 15, "#b45309"], ["S&P 500 ETF", 25, "#e5334a"], ["현금", 10, "#c3cbd8"],
+    ];
+    const svg = document.getElementById("pieSvg"), leg = document.getElementById("pieLegend");
+    let a0 = -Math.PI / 2;
+    const cx = 170, cy = 170, R = 150;
+    data.forEach(([name, pct, c]) => {
+      const a1 = a0 + pct / 100 * Math.PI * 2;
+      const large = a1 - a0 > Math.PI ? 1 : 0;
+      const d = `M${cx} ${cy} L${cx + R * Math.cos(a0)} ${cy + R * Math.sin(a0)} A${R} ${R} 0 ${large} 1 ${cx + R * Math.cos(a1)} ${cy + R * Math.sin(a1)} Z`;
+      svg.appendChild(el("path", { d, fill: c, stroke: "#fff", "stroke-width": 3 }));
+      const am = (a0 + a1) / 2;
+      svg.appendChild(el("text", { x: cx + R * 0.66 * Math.cos(am), y: cy + R * 0.66 * Math.sin(am) + 6, "text-anchor": "middle", "font-size": 17, "font-weight": 700, fill: "#fff" }, `${pct}%`));
+      const li = document.createElement("li");
+      li.className = "small";
+      li.innerHTML = `<b style="color:${c}">■</b> ${name} — $${(70000 * pct / 100).toLocaleString()}`;
+      leg.appendChild(li);
+      a0 = a1;
+    });
+    leg.querySelectorAll("li").forEach((li) => li.style.marginBottom = "4px");
+  })();
+
+  // ── 수익률 계산기 ──
+  function calcReturn() {
+    const b = Number(document.getElementById("rcBuy").value), n = Number(document.getElementById("rcNow").value);
+    const out = document.getElementById("rcOut");
+    if (!(b > 0)) { out.textContent = "-"; out.style.color = ""; return; }
+    const r = (n - b) / b * 100;
+    out.textContent = `${r > 0 ? "+" : ""}${r.toFixed(2)}%`;
+    out.style.color = r > 0 ? "var(--up)" : r < 0 ? "var(--down)" : "var(--muted)";
+  }
+  document.getElementById("rcBuy").addEventListener("input", calcReturn);
+  document.getElementById("rcNow").addEventListener("input", calcReturn);
+  calcReturn();
+
+  const start = parseInt(location.hash.slice(1), 10);
+  go(Number.isFinite(start) ? start - 1 : 0);
+})();
+</script>
+</body>
+</html>
