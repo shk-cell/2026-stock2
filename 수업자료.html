@@ -461,7 +461,9 @@
       <!-- 0~24h → 40~1080, 1h = 43.33px -->
       <rect x="430" y="40" width="282" height="40" rx="8" fill="#2563eb"/>
       <text x="571" y="66" text-anchor="middle" fill="#fff" font-size="16" font-weight="700">09:00 ~ 15:30</text>
-      <rect x="1013" y="130" width="67" height="40" rx="8" fill="#e5334a"/>
+      <rect x="1013" y="130" width="67" height="40" rx="8" fill="none" stroke="#e5334a" stroke-dasharray="4 3" stroke-width="2"/>
+      <rect x="1058" y="130" width="22" height="40" rx="6" fill="#e5334a"/>
+      <text x="1080" y="120" text-anchor="end" font-size="13" fill="#66768c">점선: 서머타임 22:30 ~ 05:00</text>
       <rect x="40" y="130" width="260" height="40" rx="8" fill="#e5334a"/>
       <text x="170" y="156" text-anchor="middle" fill="#fff" font-size="16" font-weight="700">~ 06:00 (겨울)</text>
       <rect x="40" y="130" width="217" height="40" rx="8" fill="none" stroke="#fff" stroke-dasharray="4 3" stroke-width="2"/>
@@ -472,7 +474,7 @@
       </g>
     </svg>
     <div class="grid2 mt">
-      <div class="card blue"><p>🇰🇷 <b>한국</b>: 평일 09:00 ~ 15:30</p></div>
+      <div class="card blue"><p>🇰🇷 <b>한국</b>: 평일 09:00 ~ 15:30<br><span class="small muted">한국거래소(KRX) 정규장 기준 · 대체거래소(넥스트레이드)는 08:00 ~ 20:00</span></p></div>
       <div class="card red"><p>🇺🇸 <b>미국</b>: 23:30 ~ 06:00<br><span class="small muted">서머타임(3월 중순~11월 초)에는 22:30 ~ 05:00</span></p></div>
     </div>
   </div>
@@ -602,7 +604,7 @@
   <h2>최초의 주식회사: 네덜란드 동인도회사</h2>
   <div class="body">
     <div class="row">
-      <div class="card blue center" style="width:340px;"><div class="emoji" style="font-size:90px;">⛵</div><h3>1602년 네덜란드</h3><p class="small">세계 최초로 주식을 발행한 회사</p></div>
+      <div class="card blue center" style="width:340px;"><div class="emoji" style="font-size:90px;">⛵</div><h3>1602년 네덜란드</h3><p class="small">주식을 거래소에서 사고판 최초의 회사</p></div>
       <div style="flex:1;">
         <p class="lead">아시아에서 후추 같은 향신료를 실어 오는 항해는 큰돈을 벌 수 있었지만, 배가 폭풍이나 해적을 만나면 <b class="down">전부 잃는</b> 위험한 사업이었어요.</p>
         <ul class="dots mt">
@@ -1425,7 +1427,7 @@
       <div class="card"><h3>🏛️ 세금</h3><p>국내 주식은 팔 때 증권거래세, 해외 주식은 1년 차익 중 250만 원을 넘는 부분에 22%</p></div>
       <div class="card"><h3>💱 환전 비용</h3><p>원화 ↔ 달러를 바꿀 때 드는 비용</p></div>
     </div>
-    <div class="note mt">자주 사고팔수록 비용이 눈덩이처럼 커져요. 배당금에도 세금(15.4%)이 붙어요.<br><span class="small muted">※ 세율은 2026년 기준이며 법이 바뀌면 달라질 수 있어요.</span></div>
+    <div class="note mt">자주 사고팔수록 비용이 눈덩이처럼 커져요. 배당금에도 세금이 붙어요(국내 주식 15.4%, 미국 주식은 미국에서 15%를 먼저 뗌).<br><span class="small muted">※ 세율은 2026년 기준이며 법이 바뀌면 달라질 수 있어요.</span></div>
   </div>
 </section>
 
