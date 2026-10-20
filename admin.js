@@ -94,7 +94,8 @@ window.loadStudents = async function () {
 };
 
 window.createStudent = async function () {
-  const email = $("newStudentEmail").value.trim();
+  // Firebase Auth는 이메일을 소문자로 저장 → users 문서 ID도 맞춰야 isOwner 규칙 통과
+  const email = $("newStudentEmail").value.trim().toLowerCase();
   const pw    = $("newStudentPw").value.trim();
   const nick  = $("newStudentNick").value.trim();
   if (!email || !pw || !nick) return showAlert("studentAddAlert", "모든 항목을 입력하세요.", "error");
